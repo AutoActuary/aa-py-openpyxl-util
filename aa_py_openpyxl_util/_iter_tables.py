@@ -81,8 +81,37 @@ def iter_list_object_tables(
 def is_table_range(table_range: str) -> bool:
     """
     Check if the given range can be a table, i.e. it has at least one column and at least two rows.
+
+    Examples:
+        >>> is_table_range('A1:A1')
+        False
+
+        >>> is_table_range('A1:A2')
+        True
+
+        >>> is_table_range('A1:B1')
+        False
+
+        >>> is_table_range('A1:B2')
+        True
+
+        >>> is_table_range('A1')
+        False
+
+        >>> is_table_range('')
+        False
+
+        >>> is_table_range('???')
+        False
     """
-    min_col, min_row, max_col, max_row = range_boundaries(table_range)
+    try:
+        min_col, min_row, max_col, max_row = range_boundaries(table_range)
+    except ValueError:
+        return False
+
+    if min_col is None or min_row is None or max_col is None or max_row is None:
+        return False
+
     n_rows = max_row - min_row + 1
     n_cols = max_col - min_col + 1
 
