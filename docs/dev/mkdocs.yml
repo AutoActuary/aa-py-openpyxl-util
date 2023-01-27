@@ -1,0 +1,32 @@
+site_name: aa-py-openpyxl-util
+docs_dir: src
+site_dir: dist
+theme: material
+
+markdown_extensions:
+  - def_list
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+  - gen-files:
+      scripts:
+        - gen_pages.py
+
+  - mkdocstrings:
+      watch:
+        - ../../aa_py_openpyxl_util
+      handlers:
+        python:
+          import:
+            - https://docs.python.org/3/objects.inv
+          paths: [../..]
+          options:
+            docstring_style: google
+            show_if_no_docstring: True
+            filters: []
+
+  - literate-nav:
+      nav_file: nav.md
