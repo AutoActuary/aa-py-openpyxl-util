@@ -26,7 +26,6 @@ def iter_named_range_tables(
     """
     defined_name: DefinedName
     for defined_name in book.defined_names.values():
-
         try:
             destinations = list(defined_name.destinations)
         except AttributeError:
