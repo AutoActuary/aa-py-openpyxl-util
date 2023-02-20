@@ -27,7 +27,7 @@ setuptools.setup(
     install_requires=[
         "locate>=1.1.1,==1.*",
         "openpyxl>=3.1.0,==3.1.*",  # openpyxl does not use semantic versioning.
-        "aa_py_xl_convert==0.0.1",
+        "aa_py_xl_convert>=1.0.0,==1.*",
     ],
     package_data={
         "": [
