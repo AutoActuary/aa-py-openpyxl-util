@@ -1,4 +1,4 @@
-from typing import Collection, Generator, Tuple
+from typing import Collection, Generator, Tuple, Pattern, Union
 
 from openpyxl import Workbook
 from openpyxl.utils import range_boundaries
@@ -10,16 +10,18 @@ from openpyxl.worksheet.worksheet import Worksheet
 def iter_named_range_tables(
     *,
     book: Workbook,
-    exclude_names: Collection[str],
-    exclude_sheets: Collection[str],
+    exclude_names: Collection[Union[Pattern[str], str]],
+    exclude_sheets: Collection[Union[Pattern[str], str]],
 ) -> Generator[Tuple[Worksheet, str, str], None, None]:
     """
     Iterate over named range tables in the workbook.
 
+    TODO: Change `Union[Pattern[str], str]` to `Pattern[str]` in the next major version.
+
     Args:
         book: The workbook containing the named range tables to iterate over.
-        exclude_names: Tables with these names will be excluded. Must be provided in lower case.
-        exclude_sheets: Tables in these sheets will be excluded. Must be provided in lower case.
+        exclude_names: Tables with names matching any of these patterns will be excluded.
+        exclude_sheets: Tables in sheets having names matching any of these patterns will be excluded.
 
     Returns:
         A generator of tuples like (sheet, name, range).
@@ -32,10 +34,10 @@ def iter_named_range_tables(
             destinations = []
 
         for sheet_name, table_range in destinations:
-            if sheet_name.casefold() in exclude_sheets:
+            if any_match(exclude_sheets, sheet_name.casefold()):
                 continue
 
-            if defined_name.name.casefold() in exclude_names:
+            if any_match(exclude_names, defined_name.name.casefold()):
                 continue
 
             if not is_table_range(table_range):
@@ -47,27 +49,29 @@ def iter_named_range_tables(
 def iter_list_object_tables(
     *,
     book: Workbook,
-    exclude_list_objects: Collection[str],
-    exclude_sheets: Collection[str],
+    exclude_list_objects: Collection[Union[Pattern[str], str]],
+    exclude_sheets: Collection[Union[Pattern[str], str]],
 ) -> Generator[Tuple[Worksheet, Table], None, None]:
     """
     Iterate over list object tables in the workbook.
 
+    TODO: Change `Union[Pattern[str], str]` to `Pattern[str]` in the next major version.
+
     Args:
         book: The workbook containing the list object tables to iterate over.
-        exclude_list_objects: Tables with these names will be excluded. Must be provided in lower case.
-        exclude_sheets: Tables in these sheets will be excluded. Must be provided in lower case.
+        exclude_list_objects: Tables with names matching any of these patterns will be excluded.
+        exclude_sheets: Tables in sheets having names matching any of these patterns will be excluded.
 
     Returns:
-        A generator of tuples like (name, cells).
+        A generator of tuples like (sheet, table).
     """
     sheet: Worksheet
     for sheet in book.worksheets:
-        if sheet.title.casefold() in exclude_sheets:
+        if any_match(exclude_sheets, sheet.title):
             continue
 
         for table_name in sheet.tables.keys():
-            if table_name.casefold() in exclude_list_objects:
+            if any_match(exclude_list_objects, table_name):
                 continue
 
             table = sheet.tables[table_name]
@@ -75,6 +79,27 @@ def iter_list_object_tables(
                 continue
 
             yield sheet, table
+
+
+def any_match(patterns: Collection[Union[Pattern[str], str]], string: str) -> bool:
+    """
+    Check if any of the given patterns match the given string.
+
+    TODO: Change `Union[Pattern[str], str]` to `Pattern[str]` in the next major version.
+
+    Args:
+        patterns: The patterns to check.
+        string: The string to check.
+
+    Returns:
+        True if any of the patterns match the string, False otherwise.
+    """
+    return any(
+        pattern.search(string)
+        if isinstance(pattern, Pattern)
+        else string.casefold() == pattern.casefold()
+        for pattern in patterns
+    )
 
 
 def is_table_range(table_range: str) -> bool:
