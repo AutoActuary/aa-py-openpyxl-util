@@ -1,3 +1,4 @@
+import os
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
@@ -36,6 +37,11 @@ def create_locked_file(
 
 class TestSaveWorkbookWorkaround(unittest.TestCase):
     def test_save_over_locked_file(self) -> None:
+        if os.name != "nt":
+            self.skipTest(
+                "This test only works on Windows, because file locks on Linux are merely advisory."
+            )
+
         book = Workbook(write_only=True)
         with TemporaryDirectory() as tmp_dir_str:
             tmp_dir = Path(tmp_dir_str)
