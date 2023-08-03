@@ -139,3 +139,4 @@ dmypy.json
 
 # setuptools_scm generated files
 version.py
+.vscode/settings.json

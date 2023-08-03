@@ -8,6 +8,7 @@ from typing import Generator, Dict
 from aa_py_xl_convert import converted_to_xlsx_if_necessary
 from openpyxl import load_workbook
 from openpyxl.workbook import Workbook
+from ._open_locked_file import open_locked
 
 
 @contextmanager
@@ -34,15 +35,16 @@ def safe_load_workbook(
         The workbook.
     """
     with converted_to_xlsx_if_necessary(path) as xlsx_path:
-        book: Workbook = load_workbook(
-            filename=xlsx_path,
-            read_only=read_only,
-            data_only=data_only,
-        )
-        try:
-            yield book
-        finally:
-            book.close()
+        with open_locked(xlsx_path, "rb") as file:
+            book: Workbook = load_workbook(
+                filename=file,
+                read_only=read_only,
+                data_only=data_only,
+            )
+            try:
+                yield book
+            finally:
+                book.close()
 
 
 @contextmanager
