@@ -46,7 +46,7 @@ if os.name == "nt":
             """
             if self.file is not None:
                 self.file.close()
-            ctypes.windll.kernel32.CloseHandle(self.hfile)
+            ctypes.windll.kernel32.CloseHandle(self.hfile)  # type: ignore
 
     def _open_locked(
         filename: Union[str, Path], mode: str = "r"
@@ -101,7 +101,7 @@ if os.name == "nt":
             "ab": OPEN_ALWAYS,  # for 'append' binary mode
         }
 
-        CreateFileW = ctypes.windll.kernel32.CreateFileW
+        CreateFileW = ctypes.windll.kernel32.CreateFileW  # type: ignore
 
         access_mode = access_flags.get(mode)
         if access_mode is None:
@@ -136,7 +136,7 @@ if os.name == "nt":
 
         if hfile == INVALID_HANDLE_VALUE:
             # Get the last error code
-            error_code = ctypes.GetLastError()
+            error_code = ctypes.GetLastError()  # type: ignore
 
             if error_code == ERROR_FILE_NOT_FOUND:
                 raise FileNotFoundError(f"No such file or directory: '{filename}'")
@@ -151,14 +151,14 @@ if os.name == "nt":
             elif error_code == UNKNOWN_ERROR:
                 raise OSError("Unknown error")
             else:
-                raise ctypes.WinError()
+                raise ctypes.WinError()  # type: ignore
 
         # for 'append' mode, you'd also need to move the file pointer to the end
         if mode in {"a", "ab"}:
-            ctypes.windll.kernel32.SetFilePointer(hfile, 0, None, FILE_END)
+            ctypes.windll.kernel32.SetFilePointer(hfile, 0, None, FILE_END)  # type: ignore
 
         # Convert the Windows handle into a C runtime file descriptor
-        fd = msvcrt.open_osfhandle(hfile, os.O_BINARY if "b" in mode else os.O_TEXT)
+        fd = msvcrt.open_osfhandle(hfile, os.O_BINARY if "b" in mode else os.O_TEXT)  # type: ignore
 
         # Create a Python file object from the file descriptor
         file = os.fdopen(fd, mode)
