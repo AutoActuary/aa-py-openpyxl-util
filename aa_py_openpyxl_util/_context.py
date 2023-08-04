@@ -4,7 +4,7 @@ Utilities for working with read-only openpyxl workbooks.
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, Dict
-
+import tempfile
 from aa_py_xl_convert import converted_to_xlsx_if_necessary
 from openpyxl import load_workbook
 from openpyxl.workbook import Workbook
@@ -34,8 +34,19 @@ def safe_load_workbook(
     Yields:
         The workbook.
     """
-    with converted_to_xlsx_if_necessary(path) as xlsx_path:
-        with open_locked(xlsx_path, "rb") as file:
+
+    xlsx_context = None
+    with tempfile.TemporaryDirectory() as tempdir:
+        if path.suffix.lower() not in [".xlsx", ".xlsm"]:
+            unlocked_copy = Path(tempdir, path.name)
+            with open(unlocked_copy, "wb") as dst, open_locked(path, "rb") as src:
+                dst.write(src.read())
+
+            path = (
+                xlsx_context := converted_to_xlsx_if_necessary(unlocked_copy)
+            ).__enter__()
+
+        with open_locked(path, "rb") as file:
             book: Workbook = load_workbook(
                 filename=file,
                 read_only=read_only,
@@ -45,6 +56,8 @@ def safe_load_workbook(
                 yield book
             finally:
                 book.close()
+                if xlsx_context is not None:
+                    xlsx_context.__exit__(None, None, None)
 
 
 @contextmanager
