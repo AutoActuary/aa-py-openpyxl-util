@@ -142,7 +142,7 @@ def write_tables_side_by_side(
 
     Args:
         book: A write-only workbook in which to create the sheet and table.
-        sheet_name: The name of the new sheet. Also the name of the table.
+        sheet_name: The name of the new sheet.
         tables: A sequence of table info objects.
         row_margin: The number of empty rows to leave above each table.
         col_margin: The number of empty columns to leave to the left of each table.
@@ -152,7 +152,7 @@ def write_tables_side_by_side(
     Returns:
         Dict of info about each written table, keyed by table name.
         Each value is a tuple containing:
-        - coordinates (e.g. (2,3) which means cell C2)
+        - coordinates (e.g. `(2,3)` which means cell C2)
         - openpyxl table object
     """
     sheet = book.create_sheet(title=sheet_name)
