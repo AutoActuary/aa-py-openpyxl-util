@@ -11,5 +11,6 @@ from ._write_only import (
     FormattedCell,
     TableInfo,
     write_tables_side_by_side,
+    write_tables_side_by_side_over_multiple_sheets,
     define_named_ranges_for_dict_table,
 )

@@ -124,6 +124,68 @@ class TableInfo:
     """
 
 
+def write_tables_side_by_side_over_multiple_sheets(
+    *,
+    book: Workbook,
+    base_sheet_name: str,
+    tables: Sequence[TableInfo],
+    row_margin: int,
+    col_margin: int,
+    write_captions: bool,
+    write_pre_rows: bool,
+    max_sheet_width: int,
+) -> Dict[str, Dict[str, Tuple[Tuple[int, int], Table]]]:
+    """
+    Create one or more sheets containing one or more tables, stacked horizontally.
+
+    Like `write_tables_side_by_side`, but automatically uses multiple sheets as necessary.
+
+    Args:
+        book: A write-only workbook in which to create the sheet and table.
+        base_sheet_name:
+            The name of the first sheet. If there are too many tables to fit on one sheet, a counter is appended,
+            starting at `1`. E.g.: `Tables`, `Tables1`, `Tables2`, etc.
+        tables: A sequence of table info objects.
+        row_margin: The number of empty rows to leave above each table.
+        col_margin: The number of empty columns to leave to the left of each table.
+        write_captions: Whether to write the table name and description above the table. This shifts the table down.
+        write_pre_rows: Whether to write the pre_rows (below the name and description, but above the table header).
+        max_sheet_width:
+            The maximum number of columns to write to a single sheet. If the tables are too wide, they will be split
+            across multiple sheets. The maximum sheet width in Excel from 2007 is 16384 columns. Before 2007 it was 256
+            columns. See https://support.microsoft.com/en-us/office/use-excel-with-earlier-versions-of-excel-2fd9ffcb-6fce-485b-85af-fecfd651a5ac
+
+    Returns: A dictionary with:
+        - Keys: The sheet names.
+        - Values: A dictionary with:
+            - Keys: The table names.
+            - Values: A tuple with:
+                - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
+                - The openpyxl table object.
+    """
+    result: Dict[str, Dict[str, Tuple[Tuple[int, int], Table]]] = {}
+    for i, tables_in_sheet in enumerate(
+        distribute_tables_over_multiple_sheets(
+            tables=tables,
+            max_sheet_width=max_sheet_width,
+            left_margin=col_margin,
+            gutter=col_margin,
+        )
+    ):
+        sheet_name = base_sheet_name if i == 0 else f"{base_sheet_name}{i}"
+        result[sheet_name] = write_tables_side_by_side(
+            book=book,
+            sheet_name=sheet_name,
+            tables=tables_in_sheet,
+            row_margin=row_margin,
+            col_margin=col_margin,
+            write_captions=write_captions,
+            write_pre_rows=write_pre_rows,
+        )
+
+    return result
+
+
 def write_tables_side_by_side(
     *,
     book: Workbook,
@@ -137,6 +199,9 @@ def write_tables_side_by_side(
     """
     Create a new sheet containing one or more tables, stacked horizontally.
 
+    If the tables don't all fit into one sheet, an error will be raised. If you need this situation to be handled
+    transparently, use `write_tables_side_by_side_over_multiple_sheets`.
+
     See https://openpyxl.readthedocs.io/en/stable/worksheet_tables.html#creating-a-table
     See https://openpyxl.readthedocs.io/en/stable/worksheet_tables.html#manually-adding-column-headings
 
@@ -149,11 +214,11 @@ def write_tables_side_by_side(
         write_captions: Whether to write the table name and description above the table. This shifts the table down.
         write_pre_rows: Whether to write the pre_rows (below the name and description, but above the table header).
 
-    Returns:
-        Dict of info about each written table, keyed by table name.
-        Each value is a tuple containing:
-        - coordinates (e.g. `(2,3)` which means cell C2)
-        - openpyxl table object
+    Returns: A dictionary with:
+        - Keys: The table names.
+        - Values: A tuple with:
+            - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
+            - The openpyxl table object.
     """
     sheet: WriteOnlyWorksheet = book.create_sheet(title=sheet_name)
 

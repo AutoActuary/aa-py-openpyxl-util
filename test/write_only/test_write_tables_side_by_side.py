@@ -14,6 +14,7 @@ from aa_py_openpyxl_util import (
     FormattedCell,
     find_table,
     get_cell_values,
+    write_tables_side_by_side_over_multiple_sheets,
 )
 
 
@@ -429,6 +430,86 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 [["a"], [5], [5], [5], [5], [datetime(1900, 1, 5, 0, 0)]],
                 get_cell_values(table_sheet[table_range]),
             )
+
+        test_helper(write, test)
+
+
+class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
+    def test_two_sheets(self) -> None:
+        table1 = TableInfo(
+            name="Table1",
+            column_names=["a", "b"],
+            rows=list([[FormattedCell(1), FormattedCell(2)]]),
+        )
+        table2 = TableInfo(
+            name="Table2",
+            column_names=["a", "b"],
+            rows=list([[FormattedCell(1), FormattedCell(2)]]),
+        )
+
+        def write(book: Workbook) -> None:
+            write_tables_side_by_side_over_multiple_sheets(
+                book=book,
+                base_sheet_name="Tables",
+                tables=[table1, table2],
+                row_margin=5,
+                col_margin=2,
+                write_captions=False,
+                write_pre_rows=False,
+                max_sheet_width=5,
+            )
+
+        def test(book: Workbook) -> None:
+            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            self.assertEqual(
+                [["a", "b"], [1, 2]], get_cell_values(table1_sheet[table1_range])
+            )
+            self.assertEqual("Tables", table1_sheet.title)
+
+            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            self.assertEqual(
+                [["a", "b"], [1, 2]], get_cell_values(table2_sheet[table2_range])
+            )
+            self.assertEqual("Tables1", table2_sheet.title)
+
+        test_helper(write, test)
+
+    def test_one_sheet(self) -> None:
+        table1 = TableInfo(
+            name="Table1",
+            column_names=["a", "b"],
+            rows=list([[FormattedCell(1), FormattedCell(2)]]),
+        )
+        table2 = TableInfo(
+            name="Table2",
+            column_names=["a", "b"],
+            rows=list([[FormattedCell(1), FormattedCell(2)]]),
+        )
+
+        def write(book: Workbook) -> None:
+            write_tables_side_by_side_over_multiple_sheets(
+                book=book,
+                base_sheet_name="Tables",
+                tables=[table1, table2],
+                row_margin=5,
+                col_margin=2,
+                write_captions=False,
+                write_pre_rows=False,
+                max_sheet_width=10,
+            )
+
+        def test(book: Workbook) -> None:
+            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            self.assertEqual(
+                [["a", "b"], [1, 2]], get_cell_values(table1_sheet[table1_range])
+            )
+            self.assertEqual("Tables", table1_sheet.title)
+
+            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            self.assertEqual(
+                [["a", "b"], [1, 2]], get_cell_values(table2_sheet[table2_range])
+            )
+            self.assertEqual("Tables", table2_sheet.title)
 
         test_helper(write, test)
 
