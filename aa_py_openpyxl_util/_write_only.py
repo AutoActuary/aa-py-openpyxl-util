@@ -155,7 +155,7 @@ def write_tables_side_by_side(
         - coordinates (e.g. `(2,3)` which means cell C2)
         - openpyxl table object
     """
-    sheet = book.create_sheet(title=sheet_name)
+    sheet: WriteOnlyWorksheet = book.create_sheet(title=sheet_name)
 
     # Write rows
     for i_row, row in enumerate(
