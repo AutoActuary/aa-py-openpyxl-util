@@ -7,7 +7,7 @@ import logging
 import warnings
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import Optional, Any, Sequence, Generator, List, Tuple, Dict
+from typing import Optional, Any, Sequence, Generator, List, Tuple, Dict, Iterable
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell, Cell
@@ -211,6 +211,59 @@ def write_tables_side_by_side(
         first_column += col_margin + width
 
     return results
+
+
+def distribute_tables_over_multiple_sheets(
+    *,
+    tables: Iterable[TableInfo],
+    max_sheet_width: int,
+    left_margin: int,
+    gutter: int,
+) -> List[List[TableInfo]]:
+    """
+    Distribute tables over multiple sheets, so that the total width of each sheet is within bounds.
+
+    Args:
+        tables: The table to distribute.
+        max_sheet_width: The maximum number of columns in each sheet.
+        left_margin: The number of columns to leave open left of the first table.
+        gutter: The number of columns to keep open between tables.
+
+    Returns:
+        A list of lists of tables. Each inner list represents a sheet.
+    """
+    result: List[List[TableInfo]] = []
+    current_column = 1 + left_margin  # 1-indexed, like the Excel, i.e., column A is 1.
+    current_sheet = 0
+    for table in tables:
+        if len(result) < 1:
+            result.append([])
+
+        table_width = len(table.column_names)
+        if len(result[current_sheet]) != 0:
+            current_column += gutter
+
+        if current_column + table_width - 1 > max_sheet_width:
+            # This table does not fit in the current sheet.
+
+            if len(result[current_sheet]) == 0:
+                # This is the first table in the sheet.
+                # This table will never fit.
+                raise ValueError(
+                    f"Table `{table.name}` is too wide to fit in a sheet with maximum width {max_sheet_width} "
+                    f"and a left margin of {left_margin} columns."
+                )
+
+            # Move to the next sheet.
+            current_sheet += 1
+            current_column = 1 + left_margin
+            result.append([])
+
+        # Add the table to the current sheet.
+        result[current_sheet].append(table)
+        current_column += table_width
+
+    return result
 
 
 def stack_table_rows_side_by_side(
