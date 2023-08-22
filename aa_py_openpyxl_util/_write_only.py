@@ -7,7 +7,7 @@ import logging
 import warnings
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import Optional, Any, Sequence, Generator, List, Tuple, Dict, Iterable
+from typing import Optional, Any, Sequence, Generator, List, Iterable
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell, Cell
@@ -16,6 +16,11 @@ from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.worksheet._write_only import WriteOnlyWorksheet
 from openpyxl.worksheet.formula import ArrayFormula
 from openpyxl.worksheet.table import Table, TableStyleInfo
+
+from ._written_tables_types import (
+    WrittenTables,
+    WrittenTablesInSheet,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +139,7 @@ def write_tables_side_by_side_over_multiple_sheets(
     write_captions: bool,
     write_pre_rows: bool,
     max_sheet_width: int,
-) -> Dict[str, Dict[str, Tuple[Tuple[int, int], Table]]]:
+) -> WrittenTables:
     """
     Create one or more sheets containing one or more tables, stacked horizontally.
 
@@ -163,7 +168,7 @@ def write_tables_side_by_side_over_multiple_sheets(
                 - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
                 - The openpyxl table object.
     """
-    result: Dict[str, Dict[str, Tuple[Tuple[int, int], Table]]] = {}
+    result: WrittenTables = {}
     for i, tables_in_sheet in enumerate(
         distribute_tables_over_multiple_sheets(
             tables=tables,
@@ -195,7 +200,7 @@ def write_tables_side_by_side(
     col_margin: int,
     write_captions: bool,
     write_pre_rows: bool,
-) -> Dict[str, Tuple[Tuple[int, int], Table]]:
+) -> WrittenTablesInSheet:
     """
     Create a new sheet containing one or more tables, stacked horizontally.
 
@@ -244,7 +249,7 @@ def write_tables_side_by_side(
         )
 
     # Define ListObjects
-    results: Dict[str, Tuple[Tuple[int, int], Table]] = {}
+    results: WrittenTablesInSheet = {}
 
     if not len(tables):
         return results
