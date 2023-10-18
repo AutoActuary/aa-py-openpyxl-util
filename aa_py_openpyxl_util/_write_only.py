@@ -111,11 +111,13 @@ class TableInfo:
     rows: Sequence[Sequence[FormattedCell]]
     """
     The table rows.
+    Each row MUST have the same number of items as `column_names`.
     """
 
     pre_rows: Sequence[Sequence[FormattedCell]] = field(default_factory=list)
     """
     Rows to write outside the table, above the header, but below the name and description.
+    This may be wider or narrower as the table if required.
     """
 
     style: Optional[TableStyleInfo] = field(default=default_table_style)
@@ -127,6 +129,20 @@ class TableInfo:
     """
     A table description to write below the table name.
     """
+
+    @property
+    def width(self) -> int:
+        """
+        The width of the table. This is not necessarily the same as the number of columns, because `pre_rows` is
+        allowed to be wider or narrower than the rest of the table.
+        """
+        return max(
+            [
+                len(self.column_names),
+                *(len(r) for r in self.pre_rows),
+                *(len(r) for r in self.rows),
+            ]
+        )
 
 
 def write_tables_side_by_side_over_multiple_sheets(
@@ -366,21 +382,22 @@ def stack_table_rows_side_by_side(
         for t in tables:
             yield from [FormattedCell(None)] * col_margin
             yield FormattedCell(t.name)
-            yield from [FormattedCell(None)] * (len(t.column_names) - 1)
+            yield from [FormattedCell(None)] * (t.width - 1)
 
     def table_description_row() -> Generator[FormattedCell, None, None]:
         for t in tables:
             yield from [FormattedCell(None)] * col_margin
             yield FormattedCell(t.description)
-            yield from [FormattedCell(None)] * (len(t.column_names) - 1)
+            yield from [FormattedCell(None)] * (t.width - 1)
 
     def header_row() -> Generator[FormattedCell, None, None]:
         for t in tables:
             yield from [FormattedCell(None)] * col_margin
             for c in t.column_names:
                 yield FormattedCell(c)
+            yield from [FormattedCell(None)] * (t.width - len(t.column_names))
 
-    widths = [len(t.column_names) for t in tables]
+    widths = [t.width for t in tables]
 
     def row(
         data: Sequence[Optional[Sequence[FormattedCell]]],
@@ -391,10 +408,8 @@ def stack_table_rows_side_by_side(
             if d is None:
                 yield from [FormattedCell(None)] * w
             else:
-                if len(d) != w:
-                    raise ValueError(f"Table row has {len(d)} columns. Expected {w}.")
-                for value in d:
-                    yield value
+                yield from d
+                yield from [FormattedCell(None)] * (w - len(d))
 
     for _ in range(row_margin):
         yield []
