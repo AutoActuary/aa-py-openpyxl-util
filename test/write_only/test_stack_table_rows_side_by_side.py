@@ -387,6 +387,85 @@ class TestStackTableRowsSideBySide(unittest.TestCase):
             ),
         )
 
+    def test_pre_rows_varying_widths(self) -> None:
+        """
+        Test stacking tables where the `pre_rows` are not the same width as the table.
+        """
+        # Keep all these variables names the same length for readability.
+        c___ = FormattedCell(None)
+
+        cel1 = FormattedCell(1)
+        cel2 = FormattedCell(2)
+        cel3 = FormattedCell(3)
+        cel4 = FormattedCell(4)
+
+        pre1 = FormattedCell("AA")
+        pre2 = FormattedCell("BB")
+        pre3 = FormattedCell("CC")
+        pre4 = FormattedCell("aa")
+
+        col1 = FormattedCell("a")
+        col2 = FormattedCell("b")
+
+        nam1 = FormattedCell("Table1")
+        nam2 = FormattedCell("Table2")
+        des1 = FormattedCell("Description1")
+        des2 = FormattedCell("Description2")
+
+        self.assertEqual(
+            [
+                [],
+                [c___, nam1, c___, c___, nam2, c___],
+                [c___, des1, c___, c___, des2, c___],
+                [c___, pre1, pre2, c___, pre1, c___],
+                [c___, pre3, pre4, c___, pre2, c___],
+                [c___, col1, c___, c___, col1, col2],
+                [c___, cel1, c___, c___, cel1, cel2],
+                [c___, cel2, c___, c___, cel2, cel3],
+                [c___, cel3, c___, c___, cel3, cel4],
+            ],
+            list(
+                stack_table_rows_side_by_side(
+                    tables=[
+                        # Pre-rows wider than table.
+                        TableInfo(
+                            name="Table1",
+                            description="Description1",
+                            column_names=["a"],
+                            rows=[
+                                [cel1],
+                                [cel2],
+                                [cel3],
+                            ],
+                            pre_rows=[
+                                [pre1, pre2],
+                                [pre3, pre4],
+                            ],
+                        ),
+                        # Pre-rows narrower than table.
+                        TableInfo(
+                            name="Table2",
+                            description="Description2",
+                            column_names=["a", "b"],
+                            rows=[
+                                [cel1, cel2],
+                                [cel2, cel3],
+                                [cel3, cel4],
+                            ],
+                            pre_rows=[
+                                [pre1],
+                                [pre2],
+                            ],
+                        ),
+                    ],
+                    row_margin=1,
+                    col_margin=1,
+                    write_captions=True,
+                    write_pre_rows=True,
+                )
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main(
