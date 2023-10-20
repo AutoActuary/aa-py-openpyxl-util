@@ -247,6 +247,106 @@ class TestWriteTablesSideBySide(unittest.TestCase):
 
         test_helper(write, test)
 
+    def test_pre_rows_wider_than_table(self) -> None:
+        """
+        Check that tables don't become misaligned when the "pre-rows" are wider than the tables.
+        """
+
+        def write(book: Workbook) -> None:
+            write_tables_side_by_side(
+                book=book,
+                sheet_name="Sheet1",
+                tables=[
+                    TableInfo(
+                        name="Table1",
+                        column_names=["a"],
+                        rows=[
+                            [FormattedCell(1)],
+                            [FormattedCell(2)],
+                            [FormattedCell(3)],
+                        ],
+                        pre_rows=[
+                            [FormattedCell("A"), FormattedCell("B")],
+                        ],
+                    ),
+                    TableInfo(
+                        name="Table2",
+                        column_names=["a"],
+                        rows=[
+                            [FormattedCell(1)],
+                            [FormattedCell(2)],
+                            [FormattedCell(3)],
+                        ],
+                        pre_rows=[
+                            [FormattedCell("A"), FormattedCell("B")],
+                        ],
+                    ),
+                ],
+                row_margin=1,
+                col_margin=1,
+                write_captions=False,
+                write_pre_rows=True,
+            )
+
+        def test(book: Workbook) -> None:
+            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            self.assertEqual("B3:B6", table1_range)
+
+            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            self.assertEqual("E3:E6", table2_range)
+
+        test_helper(write, test)
+
+    def test_pre_rows_narrower_than_table(self) -> None:
+        """
+        Check that tables don't become misaligned when the "pre-rows" are narrower than the tables.
+        """
+
+        def write(book: Workbook) -> None:
+            write_tables_side_by_side(
+                book=book,
+                sheet_name="Sheet1",
+                tables=[
+                    TableInfo(
+                        name="Table1",
+                        column_names=["a", "b"],
+                        rows=[
+                            [FormattedCell(1), FormattedCell(2)],
+                            [FormattedCell(2), FormattedCell(3)],
+                            [FormattedCell(3), FormattedCell(4)],
+                        ],
+                        pre_rows=[
+                            [FormattedCell("A")],
+                        ],
+                    ),
+                    TableInfo(
+                        name="Table2",
+                        column_names=["a", "b"],
+                        rows=[
+                            [FormattedCell(1), FormattedCell(2)],
+                            [FormattedCell(2), FormattedCell(3)],
+                            [FormattedCell(3), FormattedCell(4)],
+                        ],
+                        pre_rows=[
+                            [FormattedCell("A")],
+                        ],
+                    ),
+                ],
+                row_margin=1,
+                col_margin=1,
+                write_captions=False,
+                write_pre_rows=True,
+            )
+
+        def test(book: Workbook) -> None:
+            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            self.assertEqual("B3:C6", table1_range)
+
+            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            self.assertEqual("E3:F6", table2_range)
+
+        test_helper(write, test)
+
     def test_values(self) -> None:
         def write(book: Workbook) -> None:
             write_tables_side_by_side(
