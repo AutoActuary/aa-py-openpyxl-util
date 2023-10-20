@@ -278,7 +278,7 @@ def write_tables_side_by_side(
     )
     first_column = 1 + col_margin
     for t in tables:
-        width = len(t.column_names)
+        width = t.width
         if width < 1:
             raise ValueError(f"Can't create table '{t.name}' with zero columns.")
 
