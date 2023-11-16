@@ -4,6 +4,7 @@
 
 # Public packages
 openpyxl==3.1.2
+pydicti==1.2.1
 
 # Private packages
 aa_py_xl_convert==1.0.3
