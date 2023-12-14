@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, Dict
 
-from aa_py_xl_convert import converted_to_xlsx_if_necessary
 from openpyxl import load_workbook
 from openpyxl.workbook import Workbook
 
@@ -33,16 +32,15 @@ def safe_load_workbook(
     Yields:
         The workbook.
     """
-    with converted_to_xlsx_if_necessary(path) as xlsx_path:
-        book: Workbook = load_workbook(
-            filename=xlsx_path,
-            read_only=read_only,
-            data_only=data_only,
-        )
-        try:
-            yield book
-        finally:
-            book.close()
+    book: Workbook = load_workbook(
+        filename=path,
+        read_only=read_only,
+        data_only=data_only,
+    )
+    try:
+        yield book
+    finally:
+        book.close()
 
 
 @contextmanager
