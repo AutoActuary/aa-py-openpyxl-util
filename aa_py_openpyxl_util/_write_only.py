@@ -49,6 +49,9 @@ class FormattedCell:
     array: bool = False
     """
     Whether this is an array formula. This sets `t="array"` in the `f` tag in XML.
+
+    FIXME: This actually makes a CSE formula, which is not quite what we want, but it works for some use cases.
+    See https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1898
     """
 
     def create_openpyxl_cell(
