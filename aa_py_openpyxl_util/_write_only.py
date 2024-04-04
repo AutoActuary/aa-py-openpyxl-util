@@ -328,7 +328,7 @@ def distribute_tables_over_multiple_sheets(
         if len(result) < 1:
             result.append([])
 
-        table_width = len(table.column_names)
+        table_width = table.width
         if len(result[current_sheet]) != 0:
             current_column += gutter
 
