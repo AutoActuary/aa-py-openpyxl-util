@@ -1,6 +1,7 @@
 """
 Utilities for working with read-only openpyxl workbooks.
 """
+
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, Dict

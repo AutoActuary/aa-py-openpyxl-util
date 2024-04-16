@@ -1,6 +1,7 @@
 """
 Utilities for working with write-only openpyxl workbooks.
 """
+
 from __future__ import annotations
 
 import logging

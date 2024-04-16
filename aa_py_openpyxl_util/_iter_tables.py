@@ -95,9 +95,11 @@ def any_match(patterns: Collection[Union[Pattern[str], str]], string: str) -> bo
         True if any of the patterns match the string, False otherwise.
     """
     return any(
-        pattern.search(string)
-        if isinstance(pattern, Pattern)
-        else string.casefold() == pattern.casefold()
+        (
+            pattern.search(string)
+            if isinstance(pattern, Pattern)
+            else string.casefold() == pattern.casefold()
+        )
         for pattern in patterns
     )
 
