@@ -55,6 +55,29 @@ class FormattedCell:
     See https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1898
     """
 
+    def check(self) -> FormattedCell:
+        """
+        Check a cell for potential errors before writing it to a sheet.
+
+        If writing the given cell would cause the workbook to be invalid / corrupted / unusable, raise a user-friendly
+        error message here instead of letting Excel crash later.
+
+        Returns:
+            `self`, for convenience.
+
+        Raises:
+            ValueError: If the cell would cause problems.
+        """
+        if isinstance(self.value, str) and self.value.startswith("="):
+            # This is a formula. Check that it's not longer than 8192 characters.
+            formula = self.value[1:]
+            if len(formula) > 8192:
+                raise ValueError(
+                    f"Formula is too long: {len(formula)} characters. The maximum is 8192.\n{formula}"
+                )
+
+        return self
+
     def create_openpyxl_cell(
         self,
         sheet: WriteOnlyWorksheet,
@@ -260,7 +283,7 @@ def write_tables_side_by_side(
     ):
         sheet.append(
             (
-                cell.create_openpyxl_cell(
+                cell.check().create_openpyxl_cell(
                     sheet=sheet,
                     ref=f"{get_column_letter(i_col)}{i_row}",
                 )
