@@ -16,6 +16,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: Other/Proprietary License",
         "Operating System :: OS Independent",
+        "Private :: Do Not Upload",
     ],
     python_requires=">=3.8",
     use_scm_version={
