@@ -4,16 +4,45 @@ import logging
 import re
 from collections import OrderedDict
 from itertools import chain
-from typing import Generator, Optional, List, Any, Tuple
+from typing import Generator, Optional, List, Any, Tuple, Dict
 
 from openpyxl import Workbook
 from openpyxl.cell import Cell
 
 from ._data_util import data_to_dicts, skip_empty_rows
+from ._find_table import find_table
 from ._iter_tables import iter_list_object_tables, iter_named_range_tables
 from ._typing import TableCells
 
 logger = logging.Logger(__name__)
+
+
+def read_table(
+    *,
+    book: Workbook,
+    table_name: str,
+    columns: List[str] | None = None,
+) -> Generator[Dict[str, Any], None, None]:
+    sheet, table_range = find_table(book=book, name=table_name)
+    return data_to_dicts(
+        data=sheet[table_range],
+        columns=columns,
+        value_callback=get_cell_value,
+        header_callback=get_cell_value_as_str,
+    )
+
+
+def read_dict_table(
+    *,
+    book: Workbook,
+    table_name: str,
+    key_column: str = "Key",
+    value_column: str = "Value",
+) -> Dict[str, Any]:
+    data = read_table(
+        book=book, table_name=table_name, columns=[key_column, value_column]
+    )
+    return {row[key_column]: row[value_column] for row in data}
 
 
 def extract_data_from_numbered_tables(
