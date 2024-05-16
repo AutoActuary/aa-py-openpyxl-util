@@ -8,7 +8,7 @@ from ._extract import extract_data_from_numbered_tables, read_table, read_dict_t
 from ._find_table import find_table
 from ._iter_tables import iter_named_range_tables, iter_list_object_tables
 from ._typing import TableCells
-from ._workaround import save_workbook_workaround
+from ._workarounds import save_workbook_workaround
 from ._write_only import (
     FormattedCell,
     TableInfo,
