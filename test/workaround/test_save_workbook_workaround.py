@@ -9,7 +9,7 @@ from openpyxl.workbook import Workbook
 from portalocker import Lock, LockFlags
 
 # noinspection PyProtectedMember
-from aa_py_openpyxl_util._workaround import save_workbook_workaround
+from aa_py_openpyxl_util._workarounds import save_workbook_workaround
 
 
 @contextmanager
