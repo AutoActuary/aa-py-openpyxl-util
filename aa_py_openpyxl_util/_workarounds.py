@@ -53,14 +53,14 @@ def remove_atexit_permission_error() -> None:
         import openpyxl.worksheet._writer
     except ModuleNotFoundError:
         warnings.warn(
-            "ModuleNotFoundError in aa_py_openpyxl_util: cannot import openpyxl.worksheet._writer when trying to override the atexit PermissionError behavior.",
+            "ModuleNotFoundError in aa_py_openpyxl_util.remove_atexit_permission_error: cannot import openpyxl.worksheet._writer",
             RuntimeWarning,
         )
         return
 
     if not hasattr(openpyxl.worksheet._writer, "ALL_TEMP_FILES"):
         warnings.warn(
-            "AttributeError in aa_py_openpyxl_util: openpyxl.worksheet._writer does not have attribute 'ALL_TEMP_FILES' when trying to override the atexit PermissionError behavior.",
+            "AttributeError in aa_py_openpyxl_util.remove_atexit_permission_error: openpyxl.worksheet._writer does not have attribute 'ALL_TEMP_FILES'",
             RuntimeWarning,
         )
         return
