@@ -34,7 +34,7 @@ def save_workbook_workaround(*, book: Workbook, p: Path) -> None:
         ExcelWriter(book, archive).write_data()
 
 
-def remove_atexit_permission_error():
+def remove_atexit_permission_error() -> None:
     """
     Registers a new atexit function to preemptively handle PermissionError in openpyxl.
 
@@ -75,7 +75,7 @@ def remove_atexit_permission_error():
                 pass
 
     @atexit.register
-    def _openpyxl_shutdown_fix():
+    def _openpyxl_shutdown_fix() -> None:
         for path in list(openpyxl.worksheet._writer.ALL_TEMP_FILES):
             if os.path.exists(path):
                 try:
