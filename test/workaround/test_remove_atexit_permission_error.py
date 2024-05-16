@@ -6,6 +6,7 @@ import unittest
 import atexit
 import warnings
 import os
+from aa_py_openpyxl_util import remove_atexit_permission_error
 
 if os.name == "nt":
 
@@ -42,10 +43,10 @@ if os.name == "nt":
                 warnings.simplefilter("ignore", ResourceWarning)
 
                 import openpyxl.worksheet._writer
-                import aa_py_openpyxl_util
 
                 tmp = openpyxl.worksheet._writer.create_temporary_file()
                 create_subprocess_lock(tmp)
 
+                remove_atexit_permission_error()
                 atexit._run_exitfuncs()
                 openpyxl.worksheet._writer._openpyxl_shutdown()
