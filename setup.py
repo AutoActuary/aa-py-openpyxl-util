@@ -18,7 +18,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Private :: Do Not Upload",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.11",
     use_scm_version={
         "write_to": "aa_py_openpyxl_util/version.py",
     },

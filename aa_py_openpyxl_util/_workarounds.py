@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from functools import cache
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from openpyxl.workbook import Workbook
@@ -34,6 +35,7 @@ def save_workbook_workaround(*, book: Workbook, p: Path) -> None:
         ExcelWriter(book, archive).write_data()
 
 
+@cache
 def remove_atexit_permission_error() -> None:
     """
     Registers a new atexit function to preemptively handle PermissionError in openpyxl.

@@ -9,16 +9,22 @@ on:
 jobs:
   test:
     timeout-minutes: 120
+
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11']
+
     steps:
       - uses: actions/checkout@v4
         timeout-minutes: 10
 
-      - name: Set up Python 3.8
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
-        timeout-minutes: 10
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         env:
