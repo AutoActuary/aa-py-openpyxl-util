@@ -50,3 +50,14 @@ if os.name == "nt":
                 remove_atexit_permission_error()
                 atexit._run_exitfuncs()
                 openpyxl.worksheet._writer._openpyxl_shutdown()
+
+        def test_only_register_once(self) -> None:
+            remove_atexit_permission_error()
+            n = atexit._ncallbacks()
+            self.assertEqual(n, atexit._ncallbacks())
+
+            remove_atexit_permission_error()
+            self.assertEqual(n, atexit._ncallbacks())
+
+            remove_atexit_permission_error()
+            self.assertEqual(n, atexit._ncallbacks())
