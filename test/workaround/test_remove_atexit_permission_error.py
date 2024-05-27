@@ -9,7 +9,7 @@ import os
 from aa_py_openpyxl_util import remove_atexit_permission_error
 
 
-def create_subprocess_lock(filename):
+def create_subprocess_lock(filename: str) -> None:
     lock_code = dedent(
         f"""
         import msvcrt
