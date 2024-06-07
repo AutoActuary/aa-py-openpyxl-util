@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 from datetime import datetime
 from functools import cache
 from pathlib import Path
@@ -70,11 +71,9 @@ def remove_atexit_permission_error() -> None:
     # Remove old openpyxl temp files (likely due to PermissionError)
     now = time.time()
     for file_path in Path(tempfile.gettempdir()).glob("openpyxl.*"):
-        if now - os.stat(file_path).st_mtime > (60 * 60 * 24 * 30):
-            try:
+        with suppress(PermissionError, FileNotFoundError):
+            if now - os.stat(file_path).st_mtime > (60 * 60 * 24 * 30):
                 os.remove(file_path)
-            except PermissionError:
-                pass
 
     @atexit.register
     def _openpyxl_shutdown_fix() -> None:
@@ -82,8 +81,5 @@ def remove_atexit_permission_error() -> None:
         openpyxl.worksheet._writer.ALL_TEMP_FILES.clear()
 
         for path in temp_files_copy:
-            if os.path.exists(path):
-                try:
-                    os.remove(path)
-                except PermissionError:
-                    pass
+            with suppress(PermissionError, FileNotFoundError):
+                os.remove(path)
