@@ -78,10 +78,12 @@ def remove_atexit_permission_error() -> None:
 
     @atexit.register
     def _openpyxl_shutdown_fix() -> None:
-        for path in list(openpyxl.worksheet._writer.ALL_TEMP_FILES):
+        temp_files_copy = openpyxl.worksheet._writer.ALL_TEMP_FILES.copy()
+        openpyxl.worksheet._writer.ALL_TEMP_FILES.clear()
+
+        for path in temp_files_copy:
             if os.path.exists(path):
                 try:
                     os.remove(path)
                 except PermissionError:
                     pass
-            openpyxl.worksheet._writer.ALL_TEMP_FILES.remove(path)
