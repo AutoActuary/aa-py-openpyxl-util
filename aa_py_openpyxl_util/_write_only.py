@@ -225,6 +225,7 @@ def write_tables_side_by_side_over_multiple_sheets(
     tables: Sequence[TableInfo],
     row_margin: int,
     col_margin: int,
+    col_margin_width: int | None = None,
     write_captions: bool,
     write_pre_rows: bool,
     max_sheet_width: int,
@@ -242,6 +243,7 @@ def write_tables_side_by_side_over_multiple_sheets(
         tables: A sequence of table info objects.
         row_margin: The number of empty rows to leave above each table.
         col_margin: The number of empty columns to leave to the left of each table.
+        col_margin_width: The width of the margin columns. If None, the column width is left at the default.
         write_captions: Whether to write the table name and description above the table. This shifts the table down.
         write_pre_rows: Whether to write the pre_rows (below the name and description, but above the table header).
         max_sheet_width:
@@ -273,6 +275,7 @@ def write_tables_side_by_side_over_multiple_sheets(
             tables=tables_in_sheet,
             row_margin=row_margin,
             col_margin=col_margin,
+            col_margin_width=col_margin_width,
             write_captions=write_captions,
             write_pre_rows=write_pre_rows,
         )
@@ -287,6 +290,7 @@ def write_tables_side_by_side(
     tables: Sequence[TableInfo],
     row_margin: int,
     col_margin: int,
+    col_margin_width: int | None = None,
     write_captions: bool,
     write_pre_rows: bool,
 ) -> WrittenTablesInSheet:
@@ -305,6 +309,7 @@ def write_tables_side_by_side(
         tables: A sequence of table info objects.
         row_margin: The number of empty rows to leave above each table.
         col_margin: The number of empty columns to leave to the left of each table.
+        col_margin_width: The width of the margin columns. If None, the column width is left at the default.
         write_captions: Whether to write the table name and description above the table. This shifts the table down.
         write_pre_rows: Whether to write the pre_rows (below the name and description, but above the table header).
 
@@ -368,6 +373,14 @@ def write_tables_side_by_side(
         results[t.name] = (coords, lo)
 
         first_column += col_margin + width
+
+    if col_margin and col_margin_width:
+        # Set the width of the gutter columns.
+        for name, ((r, c), table) in results.items():
+            if c > 1:
+                sheet.column_dimensions[get_column_letter(c - 1)].width = (
+                    col_margin_width
+                )
 
     return results
 

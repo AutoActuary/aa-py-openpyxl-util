@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from typing import Callable
 
 from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import TableStyleInfo
 
 from aa_py_openpyxl_util import (
@@ -59,7 +60,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table2_sheet[table2_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_same_length(self) -> None:
         def write(book: Workbook) -> None:
@@ -107,7 +108,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table2_sheet[table2_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_different_lengths(self) -> None:
         def write(book: Workbook) -> None:
@@ -168,7 +169,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table3_sheet[table3_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_captions(self) -> None:
         def write(book: Workbook) -> None:
@@ -203,7 +204,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             self.assertEqual("Table1", table1_sheet["B2"].value)
             self.assertEqual("First table", table1_sheet["B3"].value)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_pre_rows(self) -> None:
         def write(book: Workbook) -> None:
@@ -245,7 +246,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             self.assertEqual("Pre B", table1_sheet["C2"].value)
             self.assertEqual("Pre C", table1_sheet["D2"].value)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_pre_rows_wider_than_table(self) -> None:
         """
@@ -295,7 +296,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             table2_sheet, table2_range = find_table(book=book, name="Table2")
             self.assertEqual("E3:E6", table2_range)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_pre_rows_narrower_than_table(self) -> None:
         """
@@ -345,7 +346,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             table2_sheet, table2_range = find_table(book=book, name="Table2")
             self.assertEqual("E3:F6", table2_range)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_values(self) -> None:
         def write(book: Workbook) -> None:
@@ -388,7 +389,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table_sheet[table_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_formulas(self) -> None:
         def write(book: Workbook) -> None:
@@ -487,7 +488,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table_sheet[table_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_number_format(self) -> None:
         def write(book: Workbook) -> None:
@@ -531,7 +532,50 @@ class TestWriteTablesSideBySide(unittest.TestCase):
                 get_cell_values(table_sheet[table_range]),
             )
 
-        test_helper(write, test)
+        test_helper(write, test, True)
+
+    def test_column_margins(self) -> None:
+        def write(book: Workbook) -> None:
+            write_tables_side_by_side(
+                book=book,
+                sheet_name="Sheet1",
+                tables=[
+                    TableInfo(
+                        name="Table1",
+                        column_names=["a", "b"],
+                        rows=[[FormattedCell(1), FormattedCell(2)]],
+                    ),
+                    TableInfo(
+                        name="Table2",
+                        column_names=["c", "d", "e"],
+                        rows=[[FormattedCell(3), FormattedCell(4), FormattedCell(5)]],
+                    ),
+                ],
+                row_margin=1,
+                col_margin=1,
+                col_margin_width=3,
+                write_captions=False,
+                write_pre_rows=False,
+            )
+
+        def test(book: Workbook) -> None:
+            sheet = book["Sheet1"]
+            column_letters = [get_column_letter(i + 1) for i in range(7)]
+            self.assertEqual(
+                {
+                    "A": 3.0,
+                    "B": 13.0,
+                    "C": 13.0,
+                    "D": 3.0,
+                    "E": 13.0,
+                    "F": 13.0,
+                    "G": 13.0,
+                },
+                {col: sheet.column_dimensions[col].width for col in column_letters},
+            )
+
+        # Setting column widths has no effect in `write_only` mode. This is a limitation of `openpyxl`.
+        test_helper(write, test, False)
 
 
 class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
@@ -572,7 +616,7 @@ class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
             )
             self.assertEqual("Tables1", table2_sheet.title)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
     def test_one_sheet(self) -> None:
         table1 = TableInfo(
@@ -611,14 +655,15 @@ class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
             )
             self.assertEqual("Tables", table2_sheet.title)
 
-        test_helper(write, test)
+        test_helper(write, test, True)
 
 
 def test_helper(
     write: Callable[[Workbook], None],
     test: Callable[[Workbook], None],
+    write_only: bool,
 ) -> None:
-    book = Workbook(write_only=True)
+    book = Workbook(write_only=write_only)
     write(book)
 
     with TemporaryDirectory() as tmp_dir:
