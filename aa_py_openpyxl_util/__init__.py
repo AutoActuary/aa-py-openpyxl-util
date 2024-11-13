@@ -14,8 +14,8 @@ from ._write_only import (
     TableInfo,
     write_tables_side_by_side,
     write_tables_side_by_side_over_multiple_sheets,
-    define_named_ranges_for_dict_table,
 )
+from ._named_ranges import define_named_ranges_for_dict_table
 from ._written_tables_types import (
     WrittenTables,
     WrittenTablesInSheet,
