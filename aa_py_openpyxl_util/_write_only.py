@@ -1,23 +1,25 @@
 """
 Utilities for working with write-only openpyxl workbooks.
+
+Specifically, functions which write tables side-by-side, because in write-only mode, you can't modify a row once it
+has been written, because that would mean reading it back in, which is not allowed.
 """
 
 from __future__ import annotations
 
 import logging
-import warnings
 from dataclasses import dataclass
 from itertools import zip_longest
 from typing import Optional, Any, Sequence, Generator, List, Iterable, Callable
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell, Cell
-from openpyxl.utils import get_column_letter, quote_sheetname
-from openpyxl.workbook.defined_name import DefinedName
+from openpyxl.utils import get_column_letter
 from openpyxl.worksheet._write_only import WriteOnlyWorksheet
 from openpyxl.worksheet.formula import ArrayFormula
-from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.worksheet.table import TableStyleInfo
 
+from ._list_objects import define_list_object
 from ._written_tables_types import (
     WrittenTables,
     WrittenTablesInSheet,
@@ -521,73 +523,3 @@ def stack_table_rows_side_by_side(
     if n_data_rows < 1:
         # Tables are not allowed to have zero rows. Add an empty row.
         yield []
-
-
-def define_list_object(
-    sheet: WriteOnlyWorksheet,
-    first_column: int,
-    first_row: int,
-    name: str,
-    column_names: Sequence[str],
-    n_data_rows: int,
-    style: Optional[TableStyleInfo],
-) -> Table:
-    last_column = first_column - 1 + len(column_names)
-    last_row = first_row + max(n_data_rows, 1)
-
-    table = Table(
-        displayName=name,
-        ref=f"{get_column_letter(first_column)}{first_row}:{get_column_letter(last_column)}{last_row}",
-    )
-    # noinspection PyProtectedMember
-    table._initialise_columns()
-    for column, value in zip(table.tableColumns, column_names):
-        column.name = value
-
-    if style:
-        table.tableStyleInfo = style
-
-    with warnings.catch_warnings():
-        # See https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1760
-        warnings.simplefilter(action="ignore", category=UserWarning)
-        sheet.add_table(table)
-
-    return table
-
-
-def define_named_ranges_for_dict_table(
-    *,
-    book: Workbook,
-    sheet_name: str,
-    first_table_row: int,
-    first_table_col: int,
-    keys: Sequence[str],
-    workbook_scope: bool,
-) -> None:
-    """
-    For a table with two columns representing the keys and values of a dictionary, define single-cell named ranges for
-    the cells in the `values` column.
-
-    Args:
-        book: The openpyxl Workbook in which to define the named ranges.
-        sheet_name: The sheet on which the dict table exists.
-        first_table_row: The number of the top row of the table.
-        first_table_col: The number of the left-most column of the table (1=A)
-        keys: The dictionary keys, in the same order as in the first table column.
-        workbook_scope: Whether to make a workbook-scoped named range (True) or a sheet-scoped named range (False).
-    """
-    # Values are in the second table column
-    col = first_table_col + 1
-
-    for i, key in enumerate(keys):
-        row = first_table_row + 1 + i
-        col_letter = get_column_letter(col)
-        name = DefinedName(
-            name=key,
-            attr_text=f"{quote_sheetname(sheet_name)}!${col_letter}${row}:${col_letter}${row}",
-        )
-
-        if workbook_scope:
-            book.defined_names.add(name)
-        else:
-            book[sheet_name].defined_names.add(name)
