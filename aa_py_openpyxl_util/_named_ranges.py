@@ -13,7 +13,7 @@ def define_named_ranges_for_dict_table(
     sheet_name: str,
     first_table_row: int,
     first_table_col: int,
-    keys: Sequence[str],
+    keys: Sequence[str | None],
     workbook_scope: bool,
 ) -> None:
     """
@@ -25,13 +25,18 @@ def define_named_ranges_for_dict_table(
         sheet_name: The sheet on which the dict table exists.
         first_table_row: The number of the top row of the table.
         first_table_col: The number of the left-most column of the table (1=A)
-        keys: The dictionary keys, in the same order as in the first table column.
+        keys:
+            The dictionary keys, in the same order as in the first table column.
+            If a key is None, the corresponding row will be skipped, i.e., no named range will be defined for it.
         workbook_scope: Whether to make a workbook-scoped named range (True) or a sheet-scoped named range (False).
     """
     # Values are in the second table column
     col = first_table_col + 1
 
     for i, key in enumerate(keys):
+        if key is None:
+            continue
+
         row = first_table_row + 1 + i
         col_letter = get_column_letter(col)
         name = DefinedName(
