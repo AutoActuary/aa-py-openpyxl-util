@@ -1,6 +1,6 @@
 import os
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, UTC
 from functools import cache
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -26,7 +26,7 @@ def save_workbook_workaround(*, book: Workbook, p: Path) -> None:
     if book.write_only and not book.worksheets:
         book.create_sheet()
 
-    book.properties.modified = datetime.utcnow()
+    book.properties.modified = datetime.now(UTC)
     with ZipFile(
         file=p,
         mode="w",
