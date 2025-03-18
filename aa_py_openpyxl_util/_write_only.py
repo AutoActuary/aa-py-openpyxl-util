@@ -7,9 +7,9 @@ has been written, because that would mean reading it back in, which is not allow
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
 from itertools import zip_longest
+from logging import getLogger
 from typing import Optional, Any, Sequence, Generator, List, Iterable, Callable
 
 from openpyxl import Workbook
@@ -25,7 +25,7 @@ from ._written_tables_types import (
     WrittenTablesInSheet,
 )
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 @dataclass
