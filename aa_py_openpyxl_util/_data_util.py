@@ -72,7 +72,7 @@ def data_to_dicts(
 
 
 def skip_empty_rows(
-    data: Iterable[OrderedDict[str, T]]
+    data: Iterable[OrderedDict[str, T]],
 ) -> Generator[OrderedDict[str, T], None, None]:
     """
     Skip empty rows.
