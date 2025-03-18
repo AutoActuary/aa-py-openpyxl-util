@@ -46,7 +46,7 @@ def safe_load_workbook(
 
 @contextmanager
 def changed_builtin_number_formats(
-    formats: Dict[int, str]
+    formats: Dict[int, str],
 ) -> Generator[None, None, None]:
     """
     Temporarily change one or more of `openpyxl`'s builtin number formats.

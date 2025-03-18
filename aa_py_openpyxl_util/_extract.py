@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import logging
 import re
 from collections import OrderedDict
 from itertools import chain
+from logging import getLogger
 from typing import Generator, Optional, List, Any, Tuple, Dict
 
 from openpyxl import Workbook
@@ -14,7 +14,7 @@ from ._find_table import find_table
 from ._iter_tables import iter_list_object_tables, iter_named_range_tables
 from ._typing import TableCells
 
-logger = logging.Logger(__name__)
+logger = getLogger(__name__)
 
 
 def read_table(
