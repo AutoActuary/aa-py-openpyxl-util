@@ -14,6 +14,7 @@ from typing import Optional, Any, Sequence, Generator, List, Iterable, Callable
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell, Cell
+from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet._write_only import WriteOnlyWorksheet
 from openpyxl.worksheet.formula import ArrayFormula
@@ -49,6 +50,11 @@ class FormattedCell:
     number_format: Optional[str] = None
     """
     The cell's number format. Optional.
+    """
+
+    font: Optional[Font] = None
+    """
+    The cell's font. Optional.
     """
 
     array: bool = False
@@ -114,6 +120,10 @@ class FormattedCell:
         if self.number_format:
             # noinspection PyUnresolvedReferences,PyDunderSlots
             cell.number_format = self.number_format
+
+        if self.font:
+            # noinspection PyUnresolvedReferences,PyDunderSlots
+            cell.font = self.font
 
         return cell
 
