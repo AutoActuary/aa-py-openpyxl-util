@@ -28,7 +28,9 @@ from ._written_tables_types import (
 logger = getLogger(__name__)
 
 
-@dataclass
+@dataclass(
+    kw_only=False,  # TODO: Make this True in the next major version
+)
 class FormattedCell:
     """
     Custom class to hold cell data separate from a sheet.
