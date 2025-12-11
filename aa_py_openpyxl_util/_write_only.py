@@ -14,7 +14,7 @@ from typing import Optional, Any, Sequence, Generator, List, Iterable, Callable
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell, Cell
-from openpyxl.styles import Font
+from openpyxl.styles import Font, Fill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet._write_only import WriteOnlyWorksheet
 from openpyxl.worksheet.formula import ArrayFormula
@@ -63,6 +63,11 @@ class FormattedCell:
 
     FIXME: This actually makes a CSE formula, which is not quite what we want, but it works for some use cases.
     See https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1898
+    """
+
+    fill: Optional[Fill] = None
+    """
+    The cell's fill (background). Optional.
     """
 
     def check(self) -> FormattedCell:
@@ -124,6 +129,10 @@ class FormattedCell:
         if self.font:
             # noinspection PyUnresolvedReferences,PyDunderSlots
             cell.font = self.font
+
+        if self.fill:
+            # noinspection PyUnresolvedReferences,PyDunderSlots
+            cell.fill = self.fill
 
         return cell
 
