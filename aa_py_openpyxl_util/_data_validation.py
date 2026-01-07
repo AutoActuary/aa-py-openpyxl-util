@@ -1,14 +1,14 @@
-from typing import Iterable
+from typing import Iterable, TYPE_CHECKING
 
-from openpyxl.descriptors.excel import CellRange
-from openpyxl.worksheet.datavalidation import DataValidation
-from openpyxl.worksheet.worksheet import Worksheet
+if TYPE_CHECKING:
+    from openpyxl.descriptors.excel import CellRange
+    from openpyxl.worksheet.worksheet import Worksheet
 
 
 def set_data_validation_input_message(
     *,
-    worksheet: Worksheet,
-    ranges: Iterable[str | CellRange],
+    worksheet: "Worksheet",
+    ranges: Iterable["str | CellRange"],
     title: str,
     input_message: str,
 ) -> None:
@@ -23,6 +23,8 @@ def set_data_validation_input_message(
         title: The title. It will be shortened if longer than 32 characters.
         input_message: The message. It will be shortened if longer than 255 characters.
     """
+    from openpyxl.worksheet.datavalidation import DataValidation
+
     validation = DataValidation(
         showInputMessage=True,
         promptTitle=title[:32],

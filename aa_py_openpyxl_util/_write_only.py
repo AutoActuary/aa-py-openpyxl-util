@@ -10,21 +10,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from itertools import zip_longest
 from logging import getLogger
-from typing import Optional, Any, Sequence, Generator, List, Iterable, Callable
-
-from openpyxl import Workbook
-from openpyxl.cell import WriteOnlyCell, Cell
-from openpyxl.styles import Font, Fill
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet._write_only import WriteOnlyWorksheet
-from openpyxl.worksheet.formula import ArrayFormula
-from openpyxl.worksheet.table import TableStyleInfo
+from typing import (
+    Optional,
+    Any,
+    Sequence,
+    Generator,
+    List,
+    Iterable,
+    Callable,
+    TYPE_CHECKING,
+)
 
 from ._list_objects import define_list_object
-from ._written_tables_types import (
-    WrittenTables,
-    WrittenTablesInSheet,
-)
+
+if TYPE_CHECKING:
+    from openpyxl import Workbook
+    from openpyxl.cell import Cell
+    from openpyxl.styles import Font, Fill
+    from openpyxl.worksheet.worksheet import Worksheet
+    from openpyxl.worksheet.table import TableStyleInfo
+    from ._typing import WrittenTables, WrittenTablesInSheet
 
 logger = getLogger(__name__)
 
@@ -52,7 +57,7 @@ class FormattedCell:
     The cell's number format. Optional.
     """
 
-    font: Optional[Font] = None
+    font: Optional["Font"] = None
     """
     The cell's font. Optional.
     """
@@ -65,7 +70,7 @@ class FormattedCell:
     See https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1898
     """
 
-    fill: Optional[Fill] = None
+    fill: Optional["Fill"] = None
     """
     The cell's fill (background). Optional.
     """
@@ -95,9 +100,9 @@ class FormattedCell:
 
     def create_openpyxl_cell(
         self,
-        sheet: WriteOnlyWorksheet,
+        sheet: "Worksheet",
         ref: str,
-    ) -> Cell:
+    ) -> "Cell":
         """
 
         Args:
@@ -111,6 +116,9 @@ class FormattedCell:
         Returns:
             An openpyxl `WriteOnlyCell` instance.
         """
+        from openpyxl.worksheet.formula import ArrayFormula
+        from openpyxl.cell import WriteOnlyCell
+
         value = (
             ArrayFormula(
                 ref=ref,
@@ -120,7 +128,7 @@ class FormattedCell:
             else self.value
         )
 
-        cell: Cell = WriteOnlyCell(ws=sheet, value=value)
+        cell: "Cell" = WriteOnlyCell(ws=sheet, value=value)
 
         if self.number_format:
             # noinspection PyUnresolvedReferences,PyDunderSlots
@@ -137,13 +145,16 @@ class FormattedCell:
         return cell
 
 
-default_table_style = TableStyleInfo(
-    name="TableStyleMedium2",
-    showFirstColumn=False,
-    showLastColumn=False,
-    showRowStripes=True,
-    showColumnStripes=False,
-)
+def get_default_table_style() -> "TableStyleInfo":
+    from openpyxl.worksheet.table import TableStyleInfo
+
+    return TableStyleInfo(
+        name="TableStyleMedium2",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
 
 
 class TableInfo:
@@ -177,7 +188,7 @@ class TableInfo:
     This may be wider or narrower as the table if required.
     """
 
-    style: Optional[TableStyleInfo]
+    style: Optional["TableStyleInfo"]
     """
     The table style
     """
@@ -196,13 +207,13 @@ class TableInfo:
         get_cell: Callable[[int, int], FormattedCell] | None = None,
         rows: Sequence[Sequence[FormattedCell]] | None = None,
         pre_rows: Sequence[Sequence[FormattedCell]] | None = None,
-        style: Optional[TableStyleInfo] | None = None,
+        style: Optional["TableStyleInfo"] | None = None,
         description: str | None = None,
     ):
         self.name = name
         self.column_names = column_names
         self.pre_rows = pre_rows or []
-        self.style = style or default_table_style
+        self.style = style or get_default_table_style()
         self.description = description or ""
 
         if rows is None:
@@ -243,7 +254,7 @@ class TableInfo:
 
 def write_tables_side_by_side_over_multiple_sheets(
     *,
-    book: Workbook,
+    book: "Workbook",
     base_sheet_name: str,
     tables: Sequence[TableInfo],
     row_margin: int,
@@ -252,7 +263,7 @@ def write_tables_side_by_side_over_multiple_sheets(
     write_captions: bool,
     write_pre_rows: bool,
     max_sheet_width: int,
-) -> WrittenTables:
+) -> "WrittenTables":
     """
     Create one or more sheets containing one or more tables, stacked horizontally.
 
@@ -282,7 +293,7 @@ def write_tables_side_by_side_over_multiple_sheets(
                 - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
                 - The openpyxl table object.
     """
-    result: WrittenTables = {}
+    result: "WrittenTables" = {}
     for i, tables_in_sheet in enumerate(
         distribute_tables_over_multiple_sheets(
             tables=tables,
@@ -308,7 +319,7 @@ def write_tables_side_by_side_over_multiple_sheets(
 
 def write_tables_side_by_side(
     *,
-    book: Workbook,
+    book: "Workbook",
     sheet_name: str,
     tables: Sequence[TableInfo],
     row_margin: int,
@@ -316,7 +327,7 @@ def write_tables_side_by_side(
     col_margin_width: int | None = None,
     write_captions: bool,
     write_pre_rows: bool,
-) -> WrittenTablesInSheet:
+) -> "WrittenTablesInSheet":
     """
     Create a new sheet containing one or more tables, stacked horizontally.
 
@@ -342,7 +353,9 @@ def write_tables_side_by_side(
             - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
             - The openpyxl table object.
     """
-    sheet: WriteOnlyWorksheet = book.create_sheet(title=sheet_name)
+    from openpyxl.utils import get_column_letter
+
+    sheet: "Worksheet" = book.create_sheet(title=sheet_name)
 
     # Write rows
     for i_row, row in enumerate(
@@ -366,7 +379,7 @@ def write_tables_side_by_side(
         )
 
     # Define ListObjects
-    results: WrittenTablesInSheet = {}
+    results: "WrittenTablesInSheet" = {}
 
     if not len(tables):
         return results

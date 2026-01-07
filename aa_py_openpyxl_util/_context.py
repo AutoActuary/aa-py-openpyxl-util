@@ -4,10 +4,10 @@ Utilities for working with read-only openpyxl workbooks.
 
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator, Dict
+from typing import Generator, Dict, TYPE_CHECKING
 
-from openpyxl import load_workbook
-from openpyxl.workbook import Workbook
+if TYPE_CHECKING:
+    from openpyxl.workbook import Workbook
 
 
 @contextmanager
@@ -16,9 +16,9 @@ def safe_load_workbook(
     path: Path,
     read_only: bool,
     data_only: bool,
-) -> Generator[Workbook, None, None]:
+) -> Generator["Workbook", None, None]:
     """
-    Open a workbook with openpyxl. Make sure the file handle is closed afterwards.
+    Open a workbook with openpyxl. Make sure the file handle is closed afterward.
 
     This is a context manager.
 
@@ -33,7 +33,9 @@ def safe_load_workbook(
     Yields:
         The workbook.
     """
-    book: Workbook = load_workbook(
+    from openpyxl import load_workbook
+
+    book: "Workbook" = load_workbook(
         filename=path,
         read_only=read_only,
         data_only=data_only,

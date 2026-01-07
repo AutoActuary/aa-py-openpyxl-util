@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, TYPE_CHECKING
 
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter, quote_sheetname
-from openpyxl.workbook.defined_name import DefinedName
+if TYPE_CHECKING:
+    from openpyxl import Workbook
 
 
 def define_named_ranges_for_dict_table(
     *,
-    book: Workbook,
+    book: "Workbook",
     sheet_name: str,
     first_table_row: int,
     first_table_col: int,
@@ -30,6 +29,9 @@ def define_named_ranges_for_dict_table(
             If a key is None, the corresponding row will be skipped, i.e., no named range will be defined for it.
         workbook_scope: Whether to make a workbook-scoped named range (True) or a sheet-scoped named range (False).
     """
+    from openpyxl.utils import get_column_letter, quote_sheetname
+    from openpyxl.workbook.defined_name import DefinedName
+
     # Values are in the second table column
     col = first_table_col + 1
 

@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aa-py-openpyxl-util"
+description = "Utilities that build on top of `openpyxl`."
+dynamic = ["version"]
+dependencies = [
+    "openpyxl>=3.1.2,==3.1.*",  # openpyxl does not use semantic versioning.
+    "pydicti>=1.2.1,==1.*",
+]
+authors = [
+    {name = "Rudolf Byker", email = "rudolfbyker@gmail.com"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Private :: Do Not Upload",
+]
+requires-python = ">=3.11"
+
+[project.urls]
+repository = "https://github.com/AutoActuary/aa-py-openpyxl-util"
+
+[tool.setuptools]
+include-package-data = false
+packages = [
+    "aa_py_openpyxl_util",
+]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+[tool.setuptools_scm]
+write_to = "aa_py_openpyxl_util/version.py"

@@ -1,18 +1,18 @@
-from typing import Collection, Generator, Tuple, Pattern, Union
+from typing import Collection, Generator, Tuple, Pattern, Union, TYPE_CHECKING
 
-from openpyxl import Workbook
-from openpyxl.utils import range_boundaries
-from openpyxl.workbook.defined_name import DefinedName
-from openpyxl.worksheet.table import Table
-from openpyxl.worksheet.worksheet import Worksheet
+if TYPE_CHECKING:
+    from openpyxl import Workbook
+    from openpyxl.workbook.defined_name import DefinedName
+    from openpyxl.worksheet.table import Table
+    from openpyxl.worksheet.worksheet import Worksheet
 
 
 def iter_named_range_tables(
     *,
-    book: Workbook,
+    book: "Workbook",
     exclude_names: Collection[Union[Pattern[str], str]],
     exclude_sheets: Collection[Union[Pattern[str], str]],
-) -> Generator[Tuple[Worksheet, str, str], None, None]:
+) -> Generator[Tuple["Worksheet", str, str], None, None]:
     """
     Iterate over named range tables in the workbook.
 
@@ -26,7 +26,7 @@ def iter_named_range_tables(
     Returns:
         A generator of tuples like (sheet, name, range).
     """
-    defined_name: DefinedName
+    defined_name: "DefinedName"
     for defined_name in book.defined_names.values():
         try:
             destinations = list(defined_name.destinations)
@@ -48,10 +48,10 @@ def iter_named_range_tables(
 
 def iter_list_object_tables(
     *,
-    book: Workbook,
+    book: "Workbook",
     exclude_list_objects: Collection[Union[Pattern[str], str]],
     exclude_sheets: Collection[Union[Pattern[str], str]],
-) -> Generator[Tuple[Worksheet, Table], None, None]:
+) -> Generator[Tuple["Worksheet", "Table"], None, None]:
     """
     Iterate over list object tables in the workbook.
 
@@ -65,7 +65,7 @@ def iter_list_object_tables(
     Returns:
         A generator of tuples like (sheet, table).
     """
-    sheet: Worksheet
+    sheet: "Worksheet"
     for sheet in book.worksheets:
         if any_match(exclude_sheets, sheet.title):
             continue
@@ -130,6 +130,8 @@ def is_table_range(table_range: str) -> bool:
         >>> is_table_range('???')
         False
     """
+    from openpyxl.utils import range_boundaries
+
     try:
         min_col, min_row, max_col, max_row = range_boundaries(table_range)
     except ValueError:

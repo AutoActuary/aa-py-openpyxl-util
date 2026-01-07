@@ -1,18 +1,20 @@
+import atexit
 import os
+import tempfile
+import time
+import warnings
 from contextlib import suppress
 from datetime import datetime, UTC
 from functools import cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 from zipfile import ZipFile, ZIP_DEFLATED
-from openpyxl.workbook import Workbook
-from openpyxl.writer.excel import ExcelWriter
-import tempfile
-import atexit
-import time
-import warnings
+
+if TYPE_CHECKING:
+    from openpyxl.workbook import Workbook
 
 
-def save_workbook_workaround(*, book: Workbook, p: Path) -> None:
+def save_workbook_workaround(*, book: "Workbook", p: Path) -> None:
     """
     Workaround for https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2042 .
     Use this instead of the `Workbook.save` method.
@@ -33,6 +35,8 @@ def save_workbook_workaround(*, book: Workbook, p: Path) -> None:
         compression=ZIP_DEFLATED,
         allowZip64=True,
     ) as archive:
+        from openpyxl.writer.excel import ExcelWriter
+
         ExcelWriter(book, archive).write_data()
 
 
