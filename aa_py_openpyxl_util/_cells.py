@@ -1,9 +1,10 @@
-from typing import Tuple, List, Any, Callable
+from typing import Tuple, List, Any, Callable, TYPE_CHECKING
 
-from openpyxl.cell import Cell
+if TYPE_CHECKING:
+    from openpyxl.cell import Cell
 
 
-def get_cell_values(cells: Tuple[Tuple[Cell, ...], ...]) -> List[List[Any]]:
+def get_cell_values(cells: Tuple[Tuple["Cell", ...], ...]) -> List[List[Any]]:
     """
     Get the values of the cells in the given table.
 
@@ -21,8 +22,8 @@ def get_cell_values(cells: Tuple[Tuple[Cell, ...], ...]) -> List[List[Any]]:
 
 def process_cells(
     *,
-    cells: Tuple[Tuple[Cell, ...], ...],
-    callback: Callable[[Cell], Any],
+    cells: Tuple[Tuple["Cell", ...], ...],
+    callback: Callable[["Cell"], Any],
 ) -> List[List[Any]]:
     """
     Process the cells in the given table.

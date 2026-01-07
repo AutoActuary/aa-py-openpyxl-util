@@ -4,22 +4,23 @@ import re
 from collections import OrderedDict
 from itertools import chain
 from logging import getLogger
-from typing import Generator, Optional, List, Any, Tuple, Dict
-
-from openpyxl import Workbook
-from openpyxl.cell import Cell
+from typing import Generator, Optional, List, Any, Tuple, Dict, TYPE_CHECKING
 
 from ._data_util import data_to_dicts, skip_empty_rows
 from ._find_table import find_table
 from ._iter_tables import iter_list_object_tables, iter_named_range_tables
-from ._typing import TableCells
+
+if TYPE_CHECKING:
+    from ._typing import TableCells
+    from openpyxl import Workbook
+    from openpyxl.cell import Cell
 
 logger = getLogger(__name__)
 
 
 def read_table(
     *,
-    book: Workbook,
+    book: "Workbook",
     table_name: str,
     columns: List[str] | None = None,
 ) -> Generator[Dict[str, Any], None, None]:
@@ -34,7 +35,7 @@ def read_table(
 
 def read_dict_table(
     *,
-    book: Workbook,
+    book: "Workbook",
     table_name: str,
     key_column: str = "Key",
     value_column: str = "Value",
@@ -46,7 +47,7 @@ def read_dict_table(
 
 
 def extract_data_from_numbered_tables(
-    book: Workbook,
+    book: "Workbook",
     base_name: str,
     columns: Optional[List[str]] = None,
 ) -> Generator[OrderedDict[str, Any], None, None]:
@@ -72,11 +73,11 @@ def extract_data_from_numbered_tables(
         )
 
 
-def get_cell_value_as_str(cell: Cell) -> Any:
+def get_cell_value_as_str(cell: "Cell") -> Any:
     return str(get_cell_value(cell))
 
 
-def get_cell_value(cell: Cell) -> Any:
+def get_cell_value(cell: "Cell") -> Any:
     value = cell.value
 
     # Workaround for:
@@ -96,9 +97,9 @@ def get_cell_value(cell: Cell) -> Any:
 
 
 def get_numbered_tables(
-    book: Workbook,
+    book: "Workbook",
     base_name: str,
-) -> List[Tuple[str, TableCells]]:
+) -> List[Tuple[str, "TableCells"]]:
     """
     Get a list of all tables that match ``name123`` where name is the given base name and 123 is any integer.
     The list is sorted in ascending numerical order.
@@ -118,7 +119,7 @@ def get_numbered_tables(
     re_name = re.escape(base_name.casefold())
     pattern = re.compile(rf"^{re_name}(\d+)?$")
 
-    def gen() -> Generator[Tuple[int, str, TableCells], None, None]:
+    def gen() -> Generator[Tuple[int, str, "TableCells"], None, None]:
         lo_names_and_cells = (
             (table.name, sheet[table.ref])
             for sheet, table in iter_list_object_tables(

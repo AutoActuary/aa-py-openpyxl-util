@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 import warnings
-from typing import Sequence, Optional
+from typing import Sequence, Optional, TYPE_CHECKING
 
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet._write_only import WriteOnlyWorksheet
-from openpyxl.worksheet.table import TableStyleInfo, Table
+if TYPE_CHECKING:
+    from openpyxl.worksheet.worksheet import Worksheet
+    from openpyxl.worksheet.table import TableStyleInfo, Table
 
 
 def define_list_object(
-    sheet: WriteOnlyWorksheet,
+    sheet: "Worksheet",
     first_column: int,
     first_row: int,
     name: str,
     column_names: Sequence[str],
     n_data_rows: int,
-    style: Optional[TableStyleInfo],
-) -> Table:
+    style: Optional["TableStyleInfo"],
+) -> "Table":
+    from openpyxl.worksheet.table import Table
+    from openpyxl.utils import get_column_letter
+
     last_column = first_column - 1 + len(column_names)
     last_row = first_row + max(n_data_rows, 1)
 

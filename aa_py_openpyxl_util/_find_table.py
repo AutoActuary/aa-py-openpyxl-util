@@ -1,13 +1,13 @@
-from typing import Tuple
+from typing import Tuple, TYPE_CHECKING
 
-from openpyxl import Workbook
-from openpyxl.utils import range_boundaries
-from openpyxl.workbook.defined_name import DefinedName
-from openpyxl.worksheet.table import Table
-from openpyxl.worksheet.worksheet import Worksheet
+if TYPE_CHECKING:
+    from openpyxl import Workbook
+    from openpyxl.workbook.defined_name import DefinedName
+    from openpyxl.worksheet.table import Table
+    from openpyxl.worksheet.worksheet import Worksheet
 
 
-def find_table(*, book: Workbook, name: str) -> Tuple[Worksheet, str]:
+def find_table(*, book: "Workbook", name: str) -> Tuple["Worksheet", str]:
     """
     Find a table in the given workbook. The table can be a named range or a ListObject.
     """
@@ -22,6 +22,8 @@ def find_table(*, book: Workbook, name: str) -> Tuple[Worksheet, str]:
         except KeyError as e2:
             raise KeyError(f"Table `{name}` not found: {e1.args[0]} {e2.args[0]}")
 
+    from openpyxl.utils import range_boundaries
+
     min_col, min_row, max_col, max_row = range_boundaries(table_range)
     n_rows = max_row - min_row + 1
     n_cols = max_col - min_col + 1
@@ -34,7 +36,7 @@ def find_table(*, book: Workbook, name: str) -> Tuple[Worksheet, str]:
     return sheet, table_range
 
 
-def find_named_range_by_name(*, book: Workbook, name: str) -> Tuple[Worksheet, str]:
+def find_named_range_by_name(*, book: "Workbook", name: str) -> Tuple["Worksheet", str]:
     """
     Find a named range by name.
 
@@ -46,7 +48,7 @@ def find_named_range_by_name(*, book: Workbook, name: str) -> Tuple[Worksheet, s
         A tuple of (sheet, range).
     """
     try:
-        defined_name: DefinedName = book.defined_names[name]
+        defined_name: "DefinedName" = book.defined_names[name]
     except KeyError as e:
         raise KeyError(f"Named range `{name}` not found.") from e
 
@@ -62,7 +64,9 @@ def find_named_range_by_name(*, book: Workbook, name: str) -> Tuple[Worksheet, s
     return book[sheet_name], table_range
 
 
-def find_list_object_by_name(*, book: Workbook, name: str) -> Tuple[Worksheet, Table]:
+def find_list_object_by_name(
+    *, book: "Workbook", name: str
+) -> Tuple["Worksheet", "Table"]:
     """
     Find a list object by name.
 
@@ -73,7 +77,7 @@ def find_list_object_by_name(*, book: Workbook, name: str) -> Tuple[Worksheet, T
     Returns:
         A tuple of (sheet, range).
     """
-    sheet: Worksheet
+    sheet: "Worksheet"
     for sheet in book.worksheets:
         if name in sheet.tables:
             return sheet, sheet.tables[name]
