@@ -13,12 +13,10 @@ def main() -> None:
     # Inject the repo's README.md file into the documentation as the starting page.
     nav["README.md"] = "index.md"
     with mkdocs_gen_files.open("index.md", "w") as dst:
-        dst.write(
-            """---
+        dst.write("""---
 title: README.md
 ---
-"""
-        )
+""")
         dst.write(repo_dir.joinpath("README.md").read_text(encoding="utf8"))
 
     # Generate docs from source code and inject navigation for generated files.
@@ -33,8 +31,7 @@ title: README.md
         nav[nav_path_parts] = doc_path.as_posix()
 
         with mkdocs_gen_files.open(doc_path, "w") as f:
-            f.write(
-                f"""\
+            f.write(f"""\
 ---
 title: '{path.relative_to(src_dir).name}'
 ---
@@ -42,8 +39,7 @@ title: '{path.relative_to(src_dir).name}'
 # `{path.relative_to(src_dir)}`
 
 ::: {".".join(module_path.parts)}
-"""
-            )
+""")
 
     with mkdocs_gen_files.open(f"nav.md", "w") as f:
         f.writelines(nav.build_literate_nav())

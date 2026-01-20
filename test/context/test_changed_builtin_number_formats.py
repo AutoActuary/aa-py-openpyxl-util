@@ -5,7 +5,6 @@ from openpyxl.cell import Cell
 
 from aa_py_openpyxl_util import changed_builtin_number_formats, safe_load_workbook
 
-
 data_dir = this_dir().parent.parent.joinpath("test_data")
 
 

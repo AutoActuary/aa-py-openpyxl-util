@@ -10,15 +10,13 @@ from aa_py_openpyxl_util import remove_atexit_permission_error
 
 
 def create_subprocess_lock(filename: str) -> None:
-    lock_code = dedent(
-        f"""
+    lock_code = dedent(f"""
         import msvcrt
         import time
         f = open(r'{filename}', 'wb')
         msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 0)
         time.sleep(10)
-        """
-    )
+        """)
 
     subprocess.Popen([sys.executable, "-c", lock_code])
     time.sleep(0.1)
