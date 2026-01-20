@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict
 from itertools import chain
 from logging import getLogger
-from typing import Generator, Optional, List, Any, Tuple, Dict, TYPE_CHECKING
+from typing import Generator, Optional, List, Any, Tuple, Dict, TYPE_CHECKING, Literal
 
 from ._data_util import data_to_dicts, skip_empty_rows
 from ._find_table import find_table
@@ -23,8 +23,28 @@ def read_table(
     book: "Workbook",
     table_name: str,
     columns: List[str] | None = None,
+    ci: (
+        bool | Literal["warn"]
+    ) = False,  # TODO: Make this required in the next major version.
 ) -> Generator[Dict[str, Any], None, None]:
-    sheet, table_range = find_table(book=book, name=table_name)
+    """
+    Read a table from a workbook and yield its rows as dictionaries.
+
+    Args:
+        book: The workbook, opened using openpyxl, from which to read the table.
+        table_name: The name of the table (ListObject or named range) to read.
+        columns:
+            Optional list of column names to extract.
+            If not given, all columns are extracted.
+        ci:
+            Whether the table name lookup should be case-insensitive.
+            When this is "warn", a warning is logged when the provided case does not match the actual case.
+
+    Returns:
+        A generator of dictionaries mapping column names to cell values for
+        each non-header row in the table.
+    """
+    sheet, table_range = find_table(book=book, name=table_name, ci=ci)
     return data_to_dicts(
         data=sheet[table_range],
         columns=columns,
@@ -37,11 +57,33 @@ def read_dict_table(
     *,
     book: "Workbook",
     table_name: str,
-    key_column: str = "Key",
-    value_column: str = "Value",
+    key_column: str = "Key",  # TODO: Make this required in the next major version.
+    value_column: str = "Value",  # TODO: Make this required in the next major version.
+    ci: (
+        bool | Literal["warn"]
+    ) = False,  # TODO: Make this required in the next major version.
 ) -> Dict[str, Any]:
+    """
+    Read a two-column table from a workbook and return it as a dictionary.
+
+    Args:
+        book: The openpyxl workbook object from which to read the table.
+        table_name: The name of the table (ListObject or named range) to read.
+        key_column: The name of the column whose values to use as dictionary keys.
+        value_column: The name of the column whose values to use as dictionary values.
+        ci:
+            Whether the table name lookup should be case-insensitive.
+            When this is "warn", a warning is logged when the provided case does not match the actual case.
+
+    Returns:
+        A dictionary that maps each value from `key_column` in the specified table
+        to the corresponding value from `value_column`.
+    """
     data = read_table(
-        book=book, table_name=table_name, columns=[key_column, value_column]
+        book=book,
+        table_name=table_name,
+        columns=[key_column, value_column],
+        ci=ci,
     )
     return {row[key_column]: row[value_column] for row in data}
 

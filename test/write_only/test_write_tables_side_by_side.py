@@ -46,14 +46,14 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             self.assertEqual([(2, 2), (2, 6)], [c for c, t in results.values()])
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B2:D3", table1_range)
             self.assertEqual(
                 [["a", "b", "c"], [None, None, None]],
                 get_cell_values(table1_sheet[table1_range]),
             )
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual("F2:G3", table2_range)
             self.assertEqual(
                 [["d", "e"], [None, None]],
@@ -94,14 +94,14 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             self.assertEqual([(2, 2), (2, 6)], [c for c, t in results.values()])
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B2:D4", table1_range)
             self.assertEqual(
                 [["a", "b", "c"], [1, 2, 3], [4, 5, 6]],
                 get_cell_values(table1_sheet[table1_range]),
             )
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual("F2:G4", table2_range)
             self.assertEqual(
                 [["d", "e"], [7, 8], [9, 0]],
@@ -148,21 +148,21 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             self.assertEqual([(2, 2), (2, 6), (2, 9)], [c for c, t in results.values()])
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B2:D5", table1_range)
             self.assertEqual(
                 [["a", "b", "c"], [1, 2, 3], [2, 3, 4], [3, 4, 5]],
                 get_cell_values(table1_sheet[table1_range]),
             )
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual("F2:G3", table2_range)
             self.assertEqual(
                 [["d", "e"], [None, None]],
                 get_cell_values(table2_sheet[table2_range]),
             )
 
-            table3_sheet, table3_range = find_table(book=book, name="Table3")
+            table3_sheet, table3_range = find_table(book=book, name="Table3", ci=False)
             self.assertEqual("I2:J4", table3_range)
             self.assertEqual(
                 [["f", "g"], [7, 8], [9, 0]],
@@ -195,7 +195,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B4:D7", table1_range)
             self.assertEqual(
                 [["a", "b", "c"], [1, 2, 3], [2, 3, 4], [3, 4, 5]],
@@ -236,7 +236,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B3:D6", table1_range)
             self.assertEqual(
                 [["a", "b", "c"], [1, 2, 3], [2, 3, 4], [3, 4, 5]],
@@ -290,10 +290,10 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B3:B6", table1_range)
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual("E3:E6", table2_range)
 
         test_helper(write, test, True)
@@ -340,10 +340,10 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual("B3:C6", table1_range)
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual("E3:F6", table2_range)
 
         test_helper(write, test, True)
@@ -383,7 +383,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table_sheet, table_range = find_table(book=book, name="Table1")
+            table_sheet, table_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual(
                 [["a", "b", "c"], [1, 2, 4], [2, 4, 8], [3, 6, 12], [4, 8, 16]],
                 get_cell_values(table_sheet[table_range]),
@@ -458,7 +458,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table_sheet, table_range = find_table(book=book, name="Table1")
+            table_sheet, table_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual(
                 [
                     ["a", "b", "c"],
@@ -526,7 +526,7 @@ class TestWriteTablesSideBySide(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table_sheet, table_range = find_table(book=book, name="Table1")
+            table_sheet, table_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual(
                 [["a"], [5], [5], [5], [5], [datetime(1900, 1, 5, 0, 0)]],
                 get_cell_values(table_sheet[table_range]),
@@ -604,13 +604,13 @@ class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual(
                 [["a", "b"], [1, 2]], get_cell_values(table1_sheet[table1_range])
             )
             self.assertEqual("Tables", table1_sheet.title)
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual(
                 [["a", "b"], [1, 2]], get_cell_values(table2_sheet[table2_range])
             )
@@ -643,13 +643,13 @@ class TestWriteTablesSideBySideOverMultipleSheets(unittest.TestCase):
             )
 
         def test(book: Workbook) -> None:
-            table1_sheet, table1_range = find_table(book=book, name="Table1")
+            table1_sheet, table1_range = find_table(book=book, name="Table1", ci=False)
             self.assertEqual(
                 [["a", "b"], [1, 2]], get_cell_values(table1_sheet[table1_range])
             )
             self.assertEqual("Tables", table1_sheet.title)
 
-            table2_sheet, table2_range = find_table(book=book, name="Table2")
+            table2_sheet, table2_range = find_table(book=book, name="Table2", ci=False)
             self.assertEqual(
                 [["a", "b"], [1, 2]], get_cell_values(table2_sheet[table2_range])
             )
