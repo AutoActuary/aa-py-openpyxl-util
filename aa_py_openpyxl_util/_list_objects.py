@@ -3,6 +3,8 @@ from __future__ import annotations
 import warnings
 from typing import Sequence, Optional, TYPE_CHECKING
 
+from ._excel_names import validate_excel_table_name
+
 if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet
     from openpyxl.worksheet.table import TableStyleInfo, Table
@@ -19,6 +21,8 @@ def define_list_object(
 ) -> "Table":
     from openpyxl.worksheet.table import Table
     from openpyxl.utils import get_column_letter
+
+    validate_excel_table_name(name)
 
     last_column = first_column - 1 + len(column_names)
     last_row = first_row + max(n_data_rows, 1)
