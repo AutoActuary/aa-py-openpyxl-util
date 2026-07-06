@@ -10,7 +10,7 @@ class TestDefineNamedRangesForDictTable(unittest.TestCase):
         book = Workbook()
         sheet = book.active
         sheet.title = "Sheet1"
-        keys = ["key1", "key2", "key3"]
+        keys = ["key_1", "key_2", "key_3"]
 
         define_named_ranges_for_dict_table(
             book=book,
@@ -33,7 +33,7 @@ class TestDefineNamedRangesForDictTable(unittest.TestCase):
         book = Workbook()
         sheet = book.active
         sheet.title = "Sheet1"
-        keys = ["key1", None, "key3"]
+        keys = ["key_1", None, "key_3"]
 
         define_named_ranges_for_dict_table(
             book=book,
@@ -44,15 +44,15 @@ class TestDefineNamedRangesForDictTable(unittest.TestCase):
             workbook_scope=True,
         )
 
-        self.assertEqual(book.defined_names["key1"].attr_text, "'Sheet1'!$B$2:$B$2")
-        self.assertIsNone(book.defined_names.get("key2"))
-        self.assertEqual(book.defined_names["key3"].attr_text, "'Sheet1'!$B$4:$B$4")
+        self.assertEqual(book.defined_names["key_1"].attr_text, "'Sheet1'!$B$2:$B$2")
+        self.assertIsNone(book.defined_names.get("key_2"))
+        self.assertEqual(book.defined_names["key_3"].attr_text, "'Sheet1'!$B$4:$B$4")
 
     def test_sheet_scope_named_ranges(self) -> None:
         book = Workbook()
         sheet = book.active
         sheet.title = "Sheet1"
-        keys = ["key1", "key2", "key3"]
+        keys = ["key_1", "key_2", "key_3"]
 
         define_named_ranges_for_dict_table(
             book=book,

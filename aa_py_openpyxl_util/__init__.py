@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from ._cells import process_cells, get_cell_values
 from ._context import safe_load_workbook, changed_builtin_number_formats
 from ._data_validation import set_data_validation_input_message
+from ._excel_names import ExcelNameError
 from ._extract import extract_data_from_numbered_tables, read_table, read_dict_table
 from ._find_table import find_table
 from ._iter_tables import iter_named_range_tables, iter_list_object_tables

@@ -2,6 +2,11 @@ from __future__ import annotations
 
 from typing import Sequence, TYPE_CHECKING
 
+from ._excel_names import (
+    iter_workbook_scope_excel_names,
+    validate_unique_excel_names,
+)
+
 if TYPE_CHECKING:
     from openpyxl import Workbook
 
@@ -31,6 +36,22 @@ def define_named_ranges_for_dict_table(
     """
     from openpyxl.utils import get_column_letter, quote_sheetname
     from openpyxl.workbook.defined_name import DefinedName
+
+    keys_to_define = [key for key in keys if key is not None]
+    if workbook_scope:
+        validate_unique_excel_names(
+            keys_to_define,
+            kind="defined_name",
+            existing_names=iter_workbook_scope_excel_names(book),
+            scope_label="workbook",
+        )
+    else:
+        validate_unique_excel_names(
+            keys_to_define,
+            kind="defined_name",
+            existing_names=book[sheet_name].defined_names.keys(),
+            scope_label=f"sheet {sheet_name!r}",
+        )
 
     # Values are in the second table column
     col = first_table_col + 1

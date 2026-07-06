@@ -21,6 +21,11 @@ from typing import (
     TYPE_CHECKING,
 )
 
+from ._excel_names import (
+    iter_workbook_scope_excel_names,
+    validate_excel_sheet_title,
+    validate_unique_excel_names,
+)
 from ._list_objects import define_list_object
 
 if TYPE_CHECKING:
@@ -228,8 +233,9 @@ class TableInfo:
                 raise ValueError(
                     "`rows` and (`n_rows` and `get_cell`) are mutually exclusive."
                 )
-            self.n_rows = len(rows)
-            self.get_cell = lambda i_row, i_col: rows[i_row][i_col]  # type: ignore[index]
+            rows_ = _expect_rows(rows)
+            self.n_rows = len(rows_)
+            self.get_cell = _get_cell_from_rows(rows_)
 
     @property
     def width(self) -> int:
@@ -250,6 +256,20 @@ class TableInfo:
             yield (
                 self.get_cell(i_row, i_col) for i_col in range(len(self.column_names))
             )
+
+
+def _expect_rows(
+    rows: Sequence[Sequence[FormattedCell]] | None,
+) -> Sequence[Sequence[FormattedCell]]:
+    if rows is None:
+        raise AssertionError("Expected rows to be provided.")
+    return rows
+
+
+def _get_cell_from_rows(
+    rows: Sequence[Sequence[FormattedCell]],
+) -> Callable[[int, int], FormattedCell]:
+    return lambda i_row, i_col: rows[i_row][i_col]
 
 
 def write_tables_side_by_side_over_multiple_sheets(
@@ -293,6 +313,13 @@ def write_tables_side_by_side_over_multiple_sheets(
                 - The co-ordinates of the top-left cell of the table (e.g. `(2,3)` which means cell C2)
                 - The openpyxl table object.
     """
+    validate_unique_excel_names(
+        (table.name for table in tables),
+        kind="table",
+        existing_names=iter_workbook_scope_excel_names(book),
+        scope_label="workbook",
+    )
+
     result: "WrittenTables" = {}
     for i, tables_in_sheet in enumerate(
         distribute_tables_over_multiple_sheets(
@@ -354,6 +381,14 @@ def write_tables_side_by_side(
             - The openpyxl table object.
     """
     from openpyxl.utils import get_column_letter
+
+    validate_excel_sheet_title(sheet_name)
+    validate_unique_excel_names(
+        (table.name for table in tables),
+        kind="table",
+        existing_names=iter_workbook_scope_excel_names(book),
+        scope_label="workbook",
+    )
 
     sheet: "Worksheet" = book.create_sheet(title=sheet_name)
 
