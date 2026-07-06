@@ -1,6 +1,11 @@
 import unittest
 
-from aa_py_openpyxl_util import (
+import aa_py_openpyxl_util
+from aa_py_openpyxl_util._excel_names import (
+    DuplicateExcelNameError,
+    ExcelNameError,
+    InvalidExcelNameError,
+    InvalidExcelSheetTitleError,
     is_a1_reference_like,
     is_r1c1_reference_like,
     is_valid_excel_defined_name,
@@ -14,11 +19,31 @@ from aa_py_openpyxl_util import (
     validate_excel_table_name,
     validate_unique_excel_names,
 )
-from aa_py_openpyxl_util._excel_names import (
-    DuplicateExcelNameError,
-    InvalidExcelNameError,
-    InvalidExcelSheetTitleError,
-)
+
+
+class TestExcelNamePublicExports(unittest.TestCase):
+    def test_only_base_excel_name_error_is_exported(self) -> None:
+        self.assertIs(ExcelNameError, aa_py_openpyxl_util.ExcelNameError)
+
+        for name in [
+            "is_a1_reference_like",
+            "is_r1c1_reference_like",
+            "is_valid_excel_defined_name",
+            "is_valid_excel_name",
+            "is_valid_excel_sheet_title",
+            "is_valid_excel_table_name",
+            "make_safe_excel_defined_name",
+            "make_safe_excel_name",
+            "make_safe_excel_sheet_title",
+            "make_safe_excel_table_name",
+            "validate_excel_defined_name",
+            "validate_excel_name",
+            "validate_excel_sheet_title",
+            "validate_excel_table_name",
+            "validate_unique_excel_names",
+        ]:
+            with self.subTest(name=name):
+                self.assertFalse(hasattr(aa_py_openpyxl_util, name))
 
 
 class TestExcelNameValidation(unittest.TestCase):
