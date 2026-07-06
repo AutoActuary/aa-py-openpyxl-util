@@ -8,10 +8,7 @@ from ._cells import process_cells, get_cell_values
 from ._context import safe_load_workbook, changed_builtin_number_formats
 from ._data_validation import set_data_validation_input_message
 from ._excel_names import (
-    DuplicateExcelNameError,
     ExcelNameError,
-    InvalidExcelNameError,
-    InvalidExcelSheetTitleError,
     is_a1_reference_like,
     is_r1c1_reference_like,
     is_valid_excel_defined_name,

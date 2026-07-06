@@ -1,9 +1,6 @@
 import unittest
 
 from aa_py_openpyxl_util import (
-    DuplicateExcelNameError,
-    InvalidExcelNameError,
-    InvalidExcelSheetTitleError,
     is_a1_reference_like,
     is_r1c1_reference_like,
     is_valid_excel_defined_name,
@@ -16,6 +13,11 @@ from aa_py_openpyxl_util import (
     validate_excel_sheet_title,
     validate_excel_table_name,
     validate_unique_excel_names,
+)
+from aa_py_openpyxl_util._excel_names import (
+    DuplicateExcelNameError,
+    InvalidExcelNameError,
+    InvalidExcelSheetTitleError,
 )
 
 

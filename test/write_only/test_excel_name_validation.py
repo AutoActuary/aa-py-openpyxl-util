@@ -3,14 +3,16 @@ import unittest
 from openpyxl import Workbook
 
 from aa_py_openpyxl_util import (
-    DuplicateExcelNameError,
     FormattedCell,
-    InvalidExcelNameError,
-    InvalidExcelSheetTitleError,
     TableInfo,
     define_named_ranges_for_dict_table,
     write_tables_side_by_side,
     write_tables_side_by_side_over_multiple_sheets,
+)
+from aa_py_openpyxl_util._excel_names import (
+    DuplicateExcelNameError,
+    InvalidExcelNameError,
+    InvalidExcelSheetTitleError,
 )
 
 
