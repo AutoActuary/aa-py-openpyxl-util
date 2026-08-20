@@ -1,3 +1,4 @@
+aa_py_xl==13.*; sys_platform == 'win32'  # Optional
 portalocker==2.7.0
 locate==1.1.1
 pandas==2.*
