@@ -7,6 +7,7 @@ has been written, because that would mean reading it back in, which is not allow
 
 from __future__ import annotations
 
+from copy import copy
 from dataclasses import dataclass
 from itertools import zip_longest
 from logging import getLogger
@@ -31,7 +32,7 @@ from ._list_objects import define_list_object
 if TYPE_CHECKING:
     from openpyxl import Workbook
     from openpyxl.cell import Cell
-    from openpyxl.styles import Font, Fill
+    from openpyxl.styles import Font, Fill, Color
     from openpyxl.worksheet.worksheet import Worksheet
     from openpyxl.worksheet.table import TableStyleInfo
     from ._typing import WrittenTables, WrittenTablesInSheet
@@ -78,6 +79,11 @@ class FormattedCell:
     fill: Optional["Fill"] = None
     """
     The cell's fill (background). Optional.
+    """
+
+    hyperlink: bool = False
+    """
+    Whether this cell contains a hyperlink. This affects both formatting and click behavior.
     """
 
     def check(self) -> FormattedCell:
@@ -135,17 +141,28 @@ class FormattedCell:
 
         cell: "Cell" = WriteOnlyCell(ws=sheet, value=value)
 
+        if self.hyperlink:
+            # noinspection PyUnresolvedReferences,PyDunderSlots
+            cell.style = "Hyperlink"  # This only works in English, because builtin styles are stored per language.
+
         if self.number_format:
             # noinspection PyUnresolvedReferences,PyDunderSlots
             cell.number_format = self.number_format
 
-        if self.font:
-            # noinspection PyUnresolvedReferences,PyDunderSlots
-            cell.font = self.font
-
         if self.fill:
             # noinspection PyUnresolvedReferences,PyDunderSlots
             cell.fill = self.fill
+
+        # Preserve the workbook/custom font characteristics while enforcing
+        # Excel's hyperlink color and underline.
+        font: Font = copy(self.font if self.font else cell.font)
+        if self.hyperlink:
+            from openpyxl.styles import Color
+
+            font.color = Color(theme=10)
+            font.underline = "single"
+        # noinspection PyUnresolvedReferences,PyDunderSlots
+        cell.font = font
 
         return cell
 
