@@ -3,8 +3,8 @@ Utilities for working with read-only openpyxl workbooks.
 """
 
 from contextlib import contextmanager
-from pathlib import Path
-from typing import Generator, Dict, TYPE_CHECKING
+from os import PathLike
+from typing import Generator, Dict, IO, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from openpyxl.workbook import Workbook
@@ -13,12 +13,12 @@ if TYPE_CHECKING:
 @contextmanager
 def safe_load_workbook(
     *,
-    path: Path,
+    path: str | PathLike[str] | IO[bytes],
     read_only: bool,
     data_only: bool,
 ) -> Generator["Workbook", None, None]:
     """
-    Open a workbook with openpyxl. Make sure the file handle is closed afterward.
+    Open a workbook with openpyxl and close its internal file handle afterward.
 
     This is a context manager.
 
@@ -26,7 +26,9 @@ def safe_load_workbook(
         https://stackoverflow.com/questions/31416842/openpyxl-does-not-close-excel-workbook-in-read-only-mode
 
     Args:
-        path: The path to the workbook on the disk.
+        path:
+            The path to the workbook on disk, or a binary file-like object.
+            If this is a file-like object, it remains the responsibility of the caller to close it.
         read_only: See https://openpyxl.readthedocs.io/en/stable/optimized.html?highlight=read_only#read-only-mode
         data_only: https://openpyxl.readthedocs.io/en/stable/api/openpyxl.workbook.workbook.html?highlight=data_only#openpyxl.workbook.workbook.Workbook.data_only
 
