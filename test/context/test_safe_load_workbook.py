@@ -18,13 +18,12 @@ class TestSafeLoadWorkbook(unittest.TestCase):
             self.assertEqual(["Sheet1"], book.sheetnames)
 
     def test_binary_file_like_object(self) -> None:
-        workbook_file = BytesIO(workbook_path.read_bytes())
+        with BytesIO(workbook_path.read_bytes()) as workbook_file:
+            with safe_load_workbook(
+                path=workbook_file,
+                read_only=True,
+                data_only=True,
+            ) as book:
+                self.assertEqual(["Sheet1"], book.sheetnames)
 
-        with safe_load_workbook(
-            path=workbook_file,
-            read_only=True,
-            data_only=True,
-        ) as book:
-            self.assertEqual(["Sheet1"], book.sheetnames)
-
-        self.assertFalse(workbook_file.closed)
+            self.assertFalse(workbook_file.closed)
