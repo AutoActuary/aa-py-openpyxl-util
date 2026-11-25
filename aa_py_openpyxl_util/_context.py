@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 def safe_load_workbook(
     *,
     path: str | PathLike[str] | IO[bytes],
-    read_only: bool,
-    data_only: bool,
+    read_only: bool = False,
+    data_only: bool = False,
     keep_vba: bool = False,
     keep_links: bool = True,
     rich_text: bool = False,
