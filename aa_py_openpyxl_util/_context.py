@@ -16,6 +16,9 @@ def safe_load_workbook(
     path: str | PathLike[str] | IO[bytes],
     read_only: bool,
     data_only: bool,
+    keep_vba: bool = False,
+    keep_links: bool = True,
+    rich_text: bool = False,
 ) -> Generator["Workbook", None, None]:
     """
     Open a workbook with openpyxl and close its internal file handle afterward.
@@ -29,8 +32,11 @@ def safe_load_workbook(
         path:
             The path to the workbook on disk, or a binary file-like object.
             If this is a file-like object, it remains the responsibility of the caller to close it.
-        read_only: See https://openpyxl.readthedocs.io/en/stable/optimized.html?highlight=read_only#read-only-mode
-        data_only: https://openpyxl.readthedocs.io/en/stable/api/openpyxl.workbook.workbook.html?highlight=data_only#openpyxl.workbook.workbook.Workbook.data_only
+        read_only: Passed directly to `openpyxl.load_workbook`.
+        data_only: Passed directly to `openpyxl.load_workbook`.
+        keep_vba: Passed directly to `openpyxl.load_workbook`.
+        keep_links: Passed directly to `openpyxl.load_workbook`.
+        rich_text: Passed directly to `openpyxl.load_workbook`.
 
     Yields:
         The workbook.
@@ -41,6 +47,9 @@ def safe_load_workbook(
         filename=path,
         read_only=read_only,
         data_only=data_only,
+        keep_vba=keep_vba,
+        keep_links=keep_links,
+        rich_text=rich_text,
     )
     try:
         yield book
